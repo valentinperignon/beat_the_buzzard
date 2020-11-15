@@ -70,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			radio.checked = true;
 			input.focus();
 
-			listeUtilisateurs = liste;
 			afficherListe(liste);
 		}
 	});
@@ -98,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Réception de la mise à jour d'une liste
 	 */
 	sock.on('liste', liste => {
-		listeUtilisateurs = liste;
 		if (utilisateurActuelle) {
 			afficherListe(liste);
 		}
@@ -310,9 +308,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	/**
 	 *  Affichage de la liste de joueurs
 	 */
-	function afficherListe(newList) {
-		UIChat.users.innerHTML = newList
-			.map(u => "<p data-score='0'>" + u + '</p>')
+	function afficherListe(nouvelleListe) {
+		listeUtilisateurs = Object.keys(nouvelleListe);
+		UIChat.users.innerHTML = listeUtilisateurs
+			.map(u => `<p data-score="${nouvelleListe[u]}">${u}</p>`)
 			.join('');
 	}
 

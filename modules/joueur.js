@@ -15,19 +15,19 @@ var hand = [];
 var isAI;
 
 function getScore() {
-    return score;
+	return score;
 }
 
 function getName() {
-    return name;
+	return name;
 }
 
 function getHand() {
-    return hand;
+	return hand;
 }
 
 function addScore(scoreToAdd) {
-    score += scoreToAdd;
+	score += scoreToAdd;
 }
 
 /**
@@ -35,41 +35,52 @@ function addScore(scoreToAdd) {
  * @param {String} n The player's name
  */
 function setName(n) {
-    if (n != null && n.match(/^\w+$/g)) {
-        name = n;
-    }
+	if (n != null && n.match(/^\w+$/g)) {
+		name = n;
+	}
 }
 
 function setAI() {
-    isAI = true;
+	isAI = true;
 }
 
 /**
- * 
+ *
  * @param {int} num The numero of the player in the game
  * @param {string} n The player's name
  */
 function createPlayer(num, n, AI) {
-    setName(n);
-    if (name == null) {
-        name = "Joueur " + num;
-    }
-    hand = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-    score = 0;
-    isAI = AI;
+	setName(n);
+	if (name == null) {
+		name = 'Joueur ' + num;
+	}
+	hand = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+	score = 0;
+	isAI = AI;
 }
 
 /**
  * Return the chosen card of the deck
- * 
+ *
  * @param {int} value The wanted card's value
  */
 function chooseCard(value) {
-    if (isAI) {
-        return hand.splice(Math.floor(Math.random * hand.length), 1);
-    }
-    // If no cards correspond to the parameter, return the first card of his hand
-    return (hand.indexOf(value) != -1 ? hand.splice(hand.indexOf(value), 1) : hand[0]);
+	if (isAI) {
+		return hand.splice(Math.floor(Math.random * hand.length), 1);
+	}
+	// If no cards correspond to the parameter, return the first card of his hand
+	return hand.indexOf(value) != -1
+		? hand.splice(hand.indexOf(value), 1)
+		: hand[0];
 }
 
-module.exports = { getScore, getHand, getName, addScore, setName, setAI, createPlayer, chooseCard };
+module.exports = {
+	getScore,
+	getHand,
+	getName,
+	addScore,
+	setName,
+	setAI,
+	createPlayer,
+	chooseCard,
+};

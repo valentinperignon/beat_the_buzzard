@@ -11,7 +11,7 @@ var io = require('socket.io').listen(server);
 // Configuration d'express pour utiliser le répertoire "public"
 app.use(express.static('public'));
 // set up to
-app.get('/', function (req, res) {
+app.get('/', function (_, res) {
 	res.sendFile(__dirname + '/public/vautour.html');
 });
 
@@ -65,7 +65,7 @@ io.on('connection', function (socket) {
 		// log
 		console.log('Nouvel utilisateur : ' + currentID);
 		// scores
-		var scores = JSON.parse(partieVautour.getScores());
+		var scores = JSON.parse(partieVautour.getScores(Object.keys(clients)));
 		// envoi d'un message de bienvenue à ce client
 		socket.emit('bienvenue', scores);
 		// envoi aux autres clients
@@ -209,7 +209,7 @@ io.on('connection', function (socket) {
 	//             else {
 	//                 clients[res.resultat.vainqueur].emit("message", { from: 0, to: res.resultat.vainqueur, text: res.resultat.message + " - c'est gagné", date: Date.now() });
 	//                 clients[res.resultat.perdant].emit("message", { from: 0, to: res.resultat.perdant, text: res.resultat.message + " - c'est perdu", date: Date.now() });
-	//                 io.sockets.emit("liste", JSON.parse(vautour.getScores()));
+	//                 io.sockets.emit("liste", JSON.parse(vautour.getScores(Object.keys(clients))));
 	//             }
 	//             break;
 	//     }
@@ -236,7 +236,10 @@ io.on('connection', function (socket) {
 			// désinscription du client
 			currentID = null;
 			// envoi de la nouvelle liste pour mise à jour
-			socket.broadcast.emit('liste', JSON.parse(partieVautour.getScores()));
+			socket.broadcast.emit(
+				'liste',
+				JSON.parse(partieVautour.getScores(Object.keys(clients)))
+			);
 		}
 	});
 
@@ -256,7 +259,10 @@ io.on('connection', function (socket) {
 			// désinscription du client
 			currentID = null;
 			// envoi de la nouvelle liste pour mise à jour
-			socket.broadcast.emit('liste', JSON.parse(partieVautour.getScores()));
+			socket.broadcast.emit(
+				'liste',
+				JSON.parse(partieVautour.getScores(Object.keys(clients)))
+			);
 		}
 		console.log('Client déconnecté');
 	});
