@@ -1,29 +1,28 @@
-// Chargement des modules 
-var express = require('express');
-var app = express();
-var server = app.listen(8080, function () {
-    console.log("C'est parti ! En attente de connexion sur le port 8080...");
+const express = require('express');
+const app = express();
+const server = app.listen(8080, () => {
+	console.log('Lancement du serveur sur le port 8080...');
 });
 
 // Ecoute sur les websockets
-var io = require('socket.io').listen(server);
+const io = require('socket.io').listen(server);
 
 // Configuration d'express pour utiliser le répertoire "public"
 app.use(express.static('public'));
-// set up to 
-app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/public/vautour.html');
+app.get('/', (_, res) => {
+	res.sendFile(__dirname + '/public/vautour.html');
 });
 
 // déblocage requetes cross-origin
 io.set('origins', '*:*');
 
-/***************************************************************
- *           Gestion des clients et des connexions
- ***************************************************************/
+// -------------------- Gestion des clients et des connexions --------------------
 
-var clients = {};       // { id -> socket, ... }
+const clients = {}; // { id -> socket, ... }
 
+io.on('connection', socket => {
+	console.log("Un client s'est connecté");
+	let currentID = null;
 
 /***************************************************************
  *           Gestion des parties de stupides vautours
@@ -34,6 +33,10 @@ var partieVautour = require("./modules/partie");
 // Tableau des parties en cours
 var parties = {};
 
+	/**
+	 * Gestion de jeu
+	 */
+	socket.on('vautour', () => {});
 
 /**
  *  Supprime les infos associées à l'utilisateur passé en paramètre.

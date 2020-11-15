@@ -1,20 +1,21 @@
 {
-    "env": {
-        "browser": true,
-        "node": true,
-        "commonjs": true,
-        "es6": true,
-        "mocha": true
-    },
-    "extends": "eslint:recommended",
-    "parserOptions": {
-        "ecmaVersion": 6
-    },
-    "rules": {
-      "semi": ["error", "always"],
-      "no-case-declarations": "off"
-    },
-    "globals": {
-      "io": true
-    }
+	"env": {
+		"browser": true,
+		"node": true,
+		"commonjs": true,
+		"es6": true,
+		"mocha": true
+	},
+	"extends": "eslint:recommended",
+	"parserOptions": {
+		"ecmaVersion": 6
+	},
+	"rules": {
+		"semi": ["error", "always"],
+		"no-case-declarations": "off",
+		"no-fallthrough": "off"
+	},
+	"globals": {
+		"io": true
+	}
 }
