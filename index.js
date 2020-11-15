@@ -149,6 +149,7 @@ io.on('connection', function (socket) {
             socket.emit("message", { from: null, to: currentID, text: "Aucune partie de ce nom en cours", date: Date.now() });
         }
     });
+
     // /**
     //  *  Réception d'une demande de défi
     //  */
