@@ -349,7 +349,9 @@ input[type='radio']:checked + div {
 	}
 }
 
-/* -------------------- Game -------------------- */
+/*********************************************** 
+--------------------- Game --------------------- 
+************************************************/
 
 input[type='radio']:checked + #game {
 	display: flex;
@@ -364,6 +366,7 @@ input[type='radio']:checked + #game {
 	flex-wrap: nowrap;
 	justify-content: flex-start;
 	align-items: stretch;
+	background-color: rgb(243, 103, 22);
 }
 
 #game main {
@@ -371,16 +374,20 @@ input[type='radio']:checked + #game {
 	padding: 1rem;
 }
 
+/* titre */
 #game main h1 {
-	font-weight: 300;
+	font-family: 'Permanent Marker', cursive;
+	font-weight: 900;
+	font-size: 3rem;
 	text-transform: uppercase;
 	text-align: center;
-	font-size: 1.6rem;
+	min-width: 20rem;
 }
 
 #game aside {
 	position: relative;
 	flex-grow: 0;
+	min-width: 15rem;
 	width: 30%;
 	margin: 1rem;
 	padding: 1rem;
@@ -399,10 +406,49 @@ input[type='radio']:checked + #game {
 #game aside #send-messages {
 	position: absolute;
 	bottom: 1rem;
+	width: 90%;
+	display: flexbox;
+}
+
+#game aside #message {
+	position: relative;
+	height:2rem;
+	border-radius: 30px;
+	padding: 10px;
+	border: 1px blue solid;
+	background-color: #e4e3e3;
+	text-align: left;
+	width : 85%;
+}
+
+#game aside #messages p {
+	word-wrap: break-word;
+	border-radius: 30px;
+	width : 100%;
+	padding: 1rem;
+	margin: 0.7rem 3px;
+	background-color: rgba(226, 221, 221, 0.8);
+}
+
+
+#game aside #envoyer {
+	padding: 0.3rem 0.5rem;
+	margin-left : 5%;
+	border-radius: 100%;
+	background-color: rgba(50, 110, 240, 0.774);
+	border: none;
+	color: white;
+	box-shadow: 3px 2px 5px blue ;
+}
+
+#game aside #envoyer:hover {
+    animation: moveArrow 1s;
 }
 
 #game main #liste-cartes {
 	display: flex;
+	position: absolute;
+	top: 70%;
 }
 
 #game main #liste-cartes .carte-joueur {
@@ -441,4 +487,112 @@ input[type='radio']:checked + #game {
 	background: rgba(100, 100, 100, 0.5);
 	box-shadow: 0 0 10px black;
 	cursor: pointer;
+}
+
+
+#game #annulerBtn {
+	position: absolute;
+	top: 0%;
+	left : 0%;
+	padding:  0.7rem;
+	color: white;
+}
+
+#game #annulerBtn:hover {
+	/* color: rgb(46, 45, 45); */
+	background-color: darkorange;
+	border-radius: 0% 0% 40% 0%;
+}
+
+button:hover, input[type=button]:hover, btn:hover {
+	cursor: pointer;
+}
+
+
+/* bouton pour lancer une partie */
+#game main #jouerBtn {
+	display:none;
+}
+
+/* css anim arrow button */
+
+.button {
+	display: none;
+	position: absolute;
+	top: 25%;
+	left: 25%;
+	width: 17%;
+    display: inline-flex;
+    color: #fff;
+	padding:  2.5rem;
+	border-radius: 50%;
+    align-items: center;
+    background-color: rgb(146, 180, 245);
+    box-shadow: 5px 6px 10px -5px rgba(0,100,150,0.75);
+}
+.button:hover {
+	transform: scale(1.05);
+	transition: transform 0.2s ease-in;
+	cursor: pointer;
+}  
+
+.button::before {
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    z-index: -1;
+    transition: transform 0.750s;
+}
+    
+.button span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+	margin-left: 2rem;
+    padding: 0rem 1rem;
+    overflow: visible;
+    height: 100%;
+} 
+
+.button span::after{
+    position: absolute;
+    left : 1rem;
+	content:'Lancer la partie';
+	font-size: larger;
+    width: 100%;
+}
+
+.button svg {
+	margin-left: 4.7rem;
+	min-width: 40px;
+	min-height: 18px;
+    max-height: 18px;
+    fill: white;
+}
+
+.button:hover::before {
+    transform: scaleX(1);
+}
+        
+.button:hover svg {
+    animation: moveArrow 0.750s;
+}
+
+@keyframes moveArrow {
+    
+    0% {
+        transform: translateX(0px);
+    }
+    
+    49% {
+        transform: translateX(30px);
+    }
+    
+    50% {
+        transform: translateX(-15px);
+    }
+    
+    100% {
+        transform: translateX(0px);
+    }
+    
 }

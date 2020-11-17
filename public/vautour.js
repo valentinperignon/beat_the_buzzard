@@ -365,10 +365,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		jouerBouton.innerText = 'Lancer la partie';
 		jouerBouton.setAttribute('id', 'jouerBtn');
 		UIGame.game.append(jouerBouton);
+		UIGame.game.insertAdjacentHTML("afterbegin",
+			'<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs><symbol id="arrow" viewBox="0 0 100 100"><path d="M12.5 45.83h64.58v8.33H12.5z"/><path d="M59.17 77.92l-5.84-5.84L75.43 50l-22.1-22.08 5.84-5.84L87.07 50z"/></symbol></defs></svg>'
+		);
+		UIGame.game.insertAdjacentHTML("beforeend", '<label for="jouerBtn" class="button"><span><svg><use xlink:href="#arrow" href="#arrow"></use></svg></span></label >');
 
 		// bouton pour annuler la partie
 		const annulerBouton = document.createElement('btn');
-		annulerBouton.innerText = 'Annuler la partie';
+		annulerBouton.innerText = 'Retour';
 		annulerBouton.setAttribute('id', 'annulerBtn');
 		annulerBouton.addEventListener('click', () => {
 			sock.emit('vautour', { status: 'cancel' });
@@ -459,20 +463,20 @@ document.addEventListener('DOMContentLoaded', () => {
 			connecter();
 	});
 	UIChat.input.addEventListener('keydown', e => {
-		switch (e.keyCode) {
-			case 9: // tabulation
+		switch (e.key) {
+			case "Tab": // tabulation
 				e.preventDefault(); // empêche de perdre le focus
 				completion.next();
 				break;
-			case 38: // fleche haut
+			case "ArrowUp": // fleche haut
 				e.preventDefault(); // empêche de faire revenir le curseur au début du texte
 				historique.precedent();
 				break;
-			case 40: // fleche bas
+			case "ArrowDown": // fleche bas
 				e.preventDefault(); // par principe
 				historique.suivant();
 				break;
-			case 13: // touche entrée
+			case "Enter": // touche entrée
 				envoyer(UIChat.input);
 			default:
 				completion.reset();
