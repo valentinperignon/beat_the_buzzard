@@ -124,6 +124,8 @@ io.on('connection', function (socket) {
 		}
 	});
 
+	/* -------------------- Stupide Vautour -------------------- */
+
 	/**
 	 *  Joue une partie de "stupides Vautours"
 	 */
@@ -177,7 +179,7 @@ io.on('connection', function (socket) {
 				currGame.playTurn(); // To-do
 				curr_card = currGame.getTopPile();
 			}
-			let winner = currGame.endGame();
+			//let winner = currGame.endGame();
 			// TO-DO : End the game and return to menu
 		} else {
 			socket.emit('message', {
@@ -188,32 +190,41 @@ io.on('connection', function (socket) {
 			});
 		}
 	});
-	// /**
-	//  *  Réception d'une demande de défi
-	//  */
-	// socket.on("chifoumi", function (data) {
-	//     data.choice = data.choice.substring(1, data.choice.length - 1);
-	//     var res = chifoumi.defier(currentID, data.to, data.choice);
-	//     switch (res.status) {
-	//         case 1:
-	//             clients[data.to].emit("chifoumi", currentID);
-	//         case -1:
-	//         case -2:
-	//             socket.emit("message", { from: 0, to: currentID, text: res.message, date: Date.now() });
-	//             break;
-	//         case 0:
-	//             if (res.resultat.vainqueur == null) {
-	//                 socket.emit("message", { from: 0, to: currentID, text: res.resultat.message, date: Date.now() });
-	//                 clients[data.to].emit("message", { from: 0, to: data.to, text: res.resultat.message, date: Date.now() });
-	//             }
-	//             else {
-	//                 clients[res.resultat.vainqueur].emit("message", { from: 0, to: res.resultat.vainqueur, text: res.resultat.message + " - c'est gagné", date: Date.now() });
-	//                 clients[res.resultat.perdant].emit("message", { from: 0, to: res.resultat.perdant, text: res.resultat.message + " - c'est perdu", date: Date.now() });
-	//                 io.sockets.emit("liste", JSON.parse(vautour.getScores(Object.keys(clients))));
-	//             }
-	//             break;
-	//     }
-	// });
+
+	/**
+	 * Création d'une partie de Stupide Vautour
+	 */
+	socket.on('vautour-creer', from => {
+		// TODO: créer une nouvelle partie et retourner le numéro de la partie
+		const numeroPartieTmp = Math.floor(Math.random() * 42);
+		// log
+		console.log(
+			`Création d'une partie de Stupide Vautour par ${from} (numéro ${numeroPartieTmp})`
+		);
+		// retourner le numéro de la partie
+		socket.emit('vautour-creer', numeroPartieTmp);
+	});
+
+	/**
+	 * Invitation à une partie de Stupide Vautour
+	 */
+	socket.on('vautour-invitation', data => {
+		// log
+		console.log(
+			`Invitation à "Stupide Vautour" (${data.type}) : ${data.from} -> ${data.to} (#${data.id})`
+		);
+		// transmettre l'invitation
+		clients[data.to].emit('vautour-invitation', data);
+		// traitement si invitation acceptée
+		if (data.type === 'answer') {
+			clients[data.to].broadcast.emit('vautour-liste', {
+				id: data.id,
+				liste: [data.to, data.from],
+			});
+		}
+	});
+
+	/* --------------------------------------------------------- */
 
 	/**
 	 *  Gestion des déconnexions
