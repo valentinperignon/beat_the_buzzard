@@ -249,15 +249,15 @@ input[type='radio']:checked + div {
 	margin: 3px;
 }
 
-#content main .mp {
+#content main .mp,  #game aside #messages .mp {
 	color: darkblue;
 }
 
-#content main .moi {
+#content main .moi, #game aside #messages .moi {
 	color: green;
 }
 
-#content main .system {
+#content main .system, #game aside #messages .system {
 	color: orange;
 }
 
@@ -403,6 +403,42 @@ input[type='radio']:checked + #game {
 	text-align: center;
 }
 
+#game aside #messages {
+	overflow: auto;
+	max-height: 90%;
+	scrollbar-width: 5%;
+}
+
+#game aside #messages div {
+	display: block;
+	float: left;
+	margin: 0px;
+	padding: 0px;
+	margin-right: 24%;
+	max-width: 100%;
+}
+
+#game aside #messages .moi {
+	float: right;
+	margin-right: 0%;
+	margin-left: 24%;
+}
+
+#game aside #messages div p {
+	word-wrap: break-word;
+	border-radius: 30px;
+	padding: 1rem;
+	margin: 0.7rem 3px;
+	background-color: rgba(226, 221, 221, 0.8);
+	box-shadow: 2px  2px 3px 1px grey ;
+	
+}
+
+#game aside #messages div p b {
+	font-weight:bold;
+}
+
+
 #game aside #send-messages {
 	position: absolute;
 	bottom: 1rem;
@@ -414,35 +450,35 @@ input[type='radio']:checked + #game {
 	position: relative;
 	height:2rem;
 	border-radius: 30px;
-	padding: 10px;
-	border: 1px blue solid;
+	padding: 5%;
+	margin-top: 5%;
+	margin-right: 3%;
+	border: 1px grey solid;
 	background-color: #e4e3e3;
 	text-align: left;
-	width : 85%;
+	width : 82%;
+	min-width: 30%;
 }
 
-#game aside #messages p {
-	word-wrap: break-word;
-	border-radius: 30px;
-	width : 100%;
-	padding: 1rem;
-	margin: 0.7rem 3px;
-	background-color: rgba(226, 221, 221, 0.8);
-}
-
-
-#game aside #envoyer {
-	padding: 0.3rem 0.5rem;
-	margin-left : 5%;
+#game aside #labEnvoyer {
+	padding: 0.3rem 0.4rem;
 	border-radius: 100%;
 	background-color: rgba(50, 110, 240, 0.774);
 	border: none;
 	color: white;
-	box-shadow: 3px 2px 5px blue ;
+	box-shadow: 3px 2px 5px rgba(50, 110, 240, 0.774);
+	cursor: pointer;
 }
 
-#game aside #envoyer:hover {
-    animation: moveArrow 1s;
+#game aside #labEnvoyer #envoyer {
+	background-color: transparent;
+	border: none;
+	overflow: hidden;
+	color: white;
+}
+
+#game aside #labEnvoyer:hover #envoyer {
+    animation: moveArrow 0.75s;
 }
 
 #game main #liste-cartes {
@@ -459,6 +495,15 @@ input[type='radio']:checked + #game {
 	text-align: center;
 	margin: 1rem;
 	cursor: pointer;
+	word-break: break-all;
+}
+
+#game main #liste-cartes #joueur-moi::before {
+	content:"👑";
+	position:absolute;
+	top:2%;
+	left: calc(55px + 0.5rem);
+	font-size: Larger;
 }
 
 #game main #cartes-autres {
@@ -520,8 +565,8 @@ button:hover, input[type=button]:hover, btn:hover {
 	display: none;
 	position: absolute;
 	top: 25%;
-	left: 25%;
-	width: 17%;
+	left: calc((70% - 14rem)/2);
+	width: 14rem;
     display: inline-flex;
     color: #fff;
 	padding:  2.5rem;
@@ -544,9 +589,9 @@ button:hover, input[type=button]:hover, btn:hover {
 }
     
 .button span {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
+	justify-content: center;
 	margin-left: 2rem;
     padding: 0rem 1rem;
     overflow: visible;
@@ -582,17 +627,13 @@ button:hover, input[type=button]:hover, btn:hover {
     0% {
         transform: translateX(0px);
     }
-    
     49% {
         transform: translateX(30px);
     }
-    
     50% {
         transform: translateX(-15px);
     }
-    
     100% {
         transform: translateX(0px);
-    }
-    
+    }   
 }
