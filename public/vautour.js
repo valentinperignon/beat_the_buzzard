@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	 */
 	function nettoyer() {
 		UIGame.listeCartes = '';
-		UIGame.messages.innerHTML = '';
+		UIGame.chat.messages.innerHTML = '';
 		UIChat.messages.innerHTML = '';
 		utilisateurActuel = null;
 	}
@@ -342,7 +342,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		UIChat.messages.innerHTML += message;
 		UIGame.chat.messages.innerHTML += message;
 		if (UIChat.radio.checked) {
-			document.querySelector('#content > main > p:last-child').scrollIntoView();
+			let msg = document.querySelector('#content > main > p:last-child');
+			if (msg != null) {
+				msg.scrollIntoView();
+			}
 		} else {
 			let msg = document.querySelector('#game > aside > #messages > p:last-child');
 			if (msg != null) {
