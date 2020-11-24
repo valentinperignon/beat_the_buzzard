@@ -485,6 +485,8 @@ input[type='radio']:checked + #game {
 	display: flex;
 	position: absolute;
 	top: 70%;
+	width:70%;
+	justify-content: center;
 }
 
 #game main #liste-cartes .carte-joueur {
@@ -502,7 +504,6 @@ input[type='radio']:checked + #game {
 	content:"👑";
 	position:absolute;
 	top:2%;
-	left: calc(55px + 0.5rem);
 	font-size: Larger;
 }
 
