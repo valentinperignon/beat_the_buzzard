@@ -5,6 +5,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Chat - Stupide Vautour</title>
 		<link rel="stylesheet" href="./vautour.css" />
+		<link rel="preconnect"
+			  href="https://fonts.gstatic.com">
+		<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap"
+			  rel="stylesheet">
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="./vautour.js"></script>
 	</head>
@@ -52,7 +56,8 @@
 				<div id="messages"></div>
 				<div id="send-messages">
 					<input type="text" id="message" />
-					<input type="button" value="Envoyer" id="envoyer" />
+					<label for="envoyer" id="labEnvoyer"><input type="button" value="➤" id="envoyer" /></label>
+				
 				</div>
 			</aside>
 		</div>

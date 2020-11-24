@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	// socket ouverte vers le client
 	const sock = io.connect();
 	// utilisateur courant
-	let utilisateurActuelle = null;
+	let utilisateurActuel = null;
 	let listeUtilisateurs = [];
 	// caractères spéciaux
 	const emojis = {
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Réception du message de bienvenue
 	 */
 	sock.on('bienvenue', liste => {
-		if (utilisateurActuelle) {
+		if (utilisateurActuel) {
 			const { btn: btnConnecter } = UIConnexion;
 			const { radio, username, messages, input } = UIChat;
 
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			// on vide les zones de saisie
 			messages.innerHTML = '';
 			input.value = '';
-			username.innerHTML = utilisateurActuelle;
+			username.innerHTML = utilisateurActuel;
 			radio.checked = true;
 			input.focus();
 
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Réception d'un message classique
 	 */
 	sock.on('message', msg => {
-		if (utilisateurActuelle) {
+		if (utilisateurActuel) {
 			afficherMessage(msg);
 		}
 	});
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Réception de la mise à jour d'une liste
 	 */
 	sock.on('liste', liste => {
-		if (utilisateurActuelle) {
+		if (utilisateurActuel) {
 			afficherListe(liste);
 		}
 	});
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Déconnexion d'un utilisateur
 	 */
 	sock.on('disconnect', () => {
-		utilisateurActuelle = null;
+		nettoyer();
 		UIConnexion.radio.checked = true;
 		UIChat.username.focus();
 	});
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		// recupération du pseudo
 		const user = document.getElementById('pseudo').value.trim();
 		if (!user) return;
-		utilisateurActuelle = user;
+		utilisateurActuel = user;
 		// ouverture de la connexion
 		sock.emit('login', user);
 		const { btn } = UIConnexion;
@@ -208,10 +208,21 @@ document.addEventListener('DOMContentLoaded', () => {
 	 */
 	function quitter() {
 		if (confirm('Quitter le chat ?')) {
-			utilisateurActuelle = null;
+			// Vide le contenu des chats
+			nettoyer();
 			sock.emit('logout');
 			UIConnexion.radio.checked = true;
 		}
+	}
+
+	/**
+	 * Vide les interfaces des données entrées par les utilisateurs
+	 */
+	function nettoyer() {
+		UIGame.listeCartes = '';
+		UIGame.messages.innerHTML = '';
+		UIChat.messages.innerHTML = '';
+		utilisateurActuel = null;
 	}
 
 	/* -------------------- Traitement de l'interface -------------------- */
@@ -293,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	 */
 	function afficherMessage(msg) {
 		// si réception du message alors que l'on est déconnecté du service
-		if (!utilisateurActuelle) return;
+		if (!utilisateurActuel) return;
 
 		// affichage des nouveaux messages
 		let classe = '';
@@ -301,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		// cas des messages privés
 		if (msg.from != null && msg.to != null && msg.from != 0) {
 			classe = 'mp';
-			if (msg.from == utilisateurActuelle) {
+			if (msg.from == utilisateurActuel) {
 				msg.from += ' [privé @' + msg.to + ']';
 			} else {
 				msg.from += ' [privé]';
@@ -309,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		// cas des messages ayant une origine spécifique (soi-même ou le serveur)
-		if (msg.from == utilisateurActuelle) {
+		if (msg.from == utilisateurActuel) {
 			classe = 'moi';
 		} else if (msg.from == null) {
 			classe = 'system';
@@ -327,13 +338,16 @@ document.addEventListener('DOMContentLoaded', () => {
 		// remplacement des caractères spéciaux par des émoji
 		msg.text = traiterTexte(msg.text);
 		// création et affichage du message
-		const message = `<p class="${classe}">${date} - ${msg.from} : ${msg.text}</p>`;
+		const message = `<div class="${classe}"><p><b>${date} - ${msg.from} :</b> ${msg.text}</p></div>`;
 		UIChat.messages.innerHTML += message;
 		UIGame.chat.messages.innerHTML += message;
 		if (UIChat.radio.checked) {
 			document.querySelector('#content > main > p:last-child').scrollIntoView();
 		} else {
-			document.querySelector('#game > aside > #messages').scrollIntoView();
+			let msg = document.querySelector('#game > aside > #messages > p:last-child');
+			if (msg != null) {
+				msg.scrollIntoView();
+			}
 		}
 	}
 
@@ -415,10 +429,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		jouerBouton.innerText = 'Lancer la partie';
 		jouerBouton.setAttribute('id', 'jouerBtn');
 		UIGame.game.append(jouerBouton);
+		UIGame.game.insertAdjacentHTML("afterbegin",
+			'<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs><symbol id="arrow" viewBox="0 0 100 100"><path d="M12.5 45.83h64.58v8.33H12.5z"/><path d="M59.17 77.92l-5.84-5.84L75.43 50l-22.1-22.08 5.84-5.84L87.07 50z"/></symbol></defs></svg>'
+		);
+		UIGame.game.insertAdjacentHTML("beforeend", '<label for="jouerBtn" class="button"><span><svg><use xlink:href="#arrow" href="#arrow"></use></svg></span></label >');
 
 		// bouton pour annuler la partie
 		const annulerBouton = document.createElement('btn');
-		annulerBouton.innerText = 'Annuler la partie';
+		annulerBouton.innerText = 'Retour';
 		annulerBouton.setAttribute('id', 'annulerBtn');
 		annulerBouton.addEventListener('click', () => {
 			sock.emit('vautour', { status: 'cancel' });
@@ -431,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		UIGame.game.append(listeCartes);
 
 		// carte moi
-		listeCartes.append(creerCarteJoueur(utilisateurActuelle, 'joueur-moi'));
+		listeCartes.append(creerCarteJoueur(utilisateurActuel, 'joueur-moi'));
 
 		// cartes des autres joueurs
 		const autresJoueurs = document.createElement('div');
@@ -539,32 +557,38 @@ document.addEventListener('DOMContentLoaded', () => {
 	// --> keydown
 
 	UIConnexion.input.addEventListener('keydown', e => {
-		if (e.keyCode == 13)
+		if (e.key === 'Enter')
 			// touche entrée
 			connecter();
 	});
-	UIChat.input.addEventListener('keydown', e => {
-		switch (e.keyCode) {
-			case 9: // tabulation
-				e.preventDefault(); // empêche de perdre le focus
-				completion.next();
-				break;
-			case 38: // fleche haut
-				e.preventDefault(); // empêche de faire revenir le curseur au début du texte
-				historique.precedent();
-				break;
-			case 40: // fleche bas
-				e.preventDefault(); // par principe
-				historique.suivant();
-				break;
-			case 13: // touche entrée
-				envoyer(UIChat.input);
-			default:
-				completion.reset();
-		}
-	});
+	addKeyListerners(UIChat);
+	addKeyListerners(UIGame);
 
 	// affichage de l'écran de connexion au démarrage
 	UIConnexion.radio.checked = true;
 	UIConnexion.input.focus();
+
+	function addKeyListerners(UI) {
+		UI.input.addEventListener('keydown', e => {
+			switch (e.key) {
+				case "Tab": // tabulation
+					e.preventDefault(); // empêche de perdre le focus
+					completion.next();
+					break;
+				case "ArrowUp": // fleche haut
+					e.preventDefault(); // empêche de faire revenir le curseur au début du texte
+					historique.precedent();
+					break;
+				case "ArrowDown": // fleche bas
+					e.preventDefault(); // par principe
+					historique.suivant();
+					break;
+				case "Enter": // touche entrée
+					envoyer(UI.input);
+				default:
+					completion.reset();
+			}
+		});
+	}
+
 });
