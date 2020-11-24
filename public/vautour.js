@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					const toSend = {
 						type: 'answer',
 						id: data.id,
-						from: utilisateurActuelle,
+						from: utilisateurActuel,
 						to: data.from,
 						answer: '',
 					};
@@ -397,7 +397,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		if (msg.startsWith('/vautour')) {
 			// envoyer la demande au serveur
-			sock.emit('vautour-creer', utilisateurActuelle);
+			sock.emit('vautour-creer', utilisateurActuel);
 		} else {
 			sock.emit('message', { to: to, text: msg });
 		}
@@ -475,7 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		let canAddUsers = false;
 		for (let utilisateur of listeUtilisateurs) {
 			if (
-				utilisateur === utilisateurActuelle ||
+				utilisateur === utilisateurActuel ||
 				partiesStupideVautour[partieActuelle].has(utilisateur)
 			) {
 				continue;
@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				sock.emit('vautour-invitation', {
 					type: 'ask',
 					id: partieActuelle,
-					from: utilisateurActuelle,
+					from: utilisateurActuel,
 					to: utilisateur,
 				});
 
@@ -562,7 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			connecter();
 	});
 	addKeyListerners(UIChat);
-	addKeyListerners(UIGame);
+	addKeyListerners(UIGame.chat);
 
 	// affichage de l'écran de connexion au démarrage
 	UIConnexion.radio.checked = true;
