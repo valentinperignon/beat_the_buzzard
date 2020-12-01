@@ -100,10 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (utilisateurActuel) {
       afficherMessage(msg);
       
-      if (!syntheseVocale || typeof(speechSynthesis) === 'undefined' || msg.from === utilisateurActuel) return;
+      if (!syntheseVocale || typeof(speechSynthesis) === 'undefined' || msg.from === utilisateurActuel || msg.from === '[admin]') return;
       if (msg.from === '[admin]') msg.from = 'admin';
       
-      let hearThis = new SpeechSynthesisUtterance(`Nouveau message de : ${msg.from}: ${msg.text}.`);
+      let hearThis = new SpeechSynthesisUtterance(`${msg.from} dit ${msg.text}`);
       hearThis.lang = 'fr-FR';
       speechSynthesis.speak(hearThis);
 		}
