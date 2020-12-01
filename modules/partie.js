@@ -51,6 +51,13 @@ function getNbInvite(id) {
 	return games[id].invitations.length;
 }
 
+function getInvite(id) {
+	if (id == null) {
+		return false;
+	}
+	return games[id].invitations;
+}
+
 function getPlayersList(id) {
 	if (id == null) {
 		return false;
@@ -225,6 +232,7 @@ module.exports = {
 	getNbInvite,
 	getPlayerGames,
 	getHost,
+	getInvite,
 	initGame,
 	removeInvite,
 	getScores,

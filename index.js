@@ -40,6 +40,7 @@ var scores = {};
  */
 function supprimer(name, tabID) {
 	delete clients[name];
+	delete scores[name];
 	if (tabID != undefined && tabID instanceof Array && tabID.length != 0) {
 		for (let id of tabID) {
 			partieVautour.removePlayer(id, name);
@@ -60,7 +61,8 @@ function envoyerListeVautour(id) {
 			clients[j].emit('vautour-liste', {
 				id: id,
 				liste: partieVautour.getPlayersList(id),
-				hote: partieVautour.getHost(id)
+				hote: partieVautour.getHost(id),
+				invitations: partieVautour.getInvite(id)
 			});
 		}
 	}
@@ -250,8 +252,8 @@ io.on('connection', function (socket) {
 						console.log(" " + j + " ");
 					}
 				}
+				partieVautour.removeInvite(data.id, data.from);
 				envoyerListeVautour(data.id);
-				partieVautour.removeInvite(data.id, data.to);
 			} else {
 				partieVautour.addInvite(data.id, data.to); // stocke l'invitation
 			}
@@ -296,7 +298,7 @@ io.on('connection', function (socket) {
 			// envoi de la nouvelle liste pour mise à jour
 			socket.broadcast.emit(
 				'liste',
-				JSON.parse(partieVautour.getScores(Object.keys(clients)))
+				scores
 			);
 		}
 	});
@@ -323,7 +325,7 @@ io.on('connection', function (socket) {
 			// envoi de la nouvelle liste pour mise à jour
 			socket.broadcast.emit(
 				'liste',
-				JSON.parse(partieVautour.getScores(Object.keys(clients)))
+				scores
 			);
 		}
 		console.log('Client déconnecté');

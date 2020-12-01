@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		// Mettre à jour la liste affichée
 		if (document.querySelector('#game-content #liste-cartes')) {
-			afficherListeJoueurs(data.id, data.hote);
+			afficherListeJoueurs(data.id, data.hote, data.invitations);
 		}
 	});
 
@@ -221,6 +221,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		UIGame.listeCartes = '';
 		UIGame.chat.messages.innerHTML = '';
 		UIChat.messages.innerHTML = '';
+		for (let partie in partiesStupideVautour) {
+			if (partiesStupideVautour[partie].has(utilisateurActuel)) {
+				partiesStupideVautour[partie].delete(utilisateurActuel);
+			}
+		}
 		utilisateurActuel = null;
 	}
 
@@ -500,10 +505,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 				// effacer la liste de joueurs
 				UIGame.game.removeChild(liste);
-				document
-					.getElementById('cartes-autres')
-					.append(creerCarteJoueur(utilisateur, false));
-				document.getElementById('carte-non-hote').classList.add('carte-attente');
+				if (!document.getElementById(utilisateur)) {
+					document
+						.getElementById('cartes-autres')
+						.append(creerCarteJoueur(utilisateur, false));
+					document.getElementById(utilisateur).classList.add('carte-attente');
+				}
 			});
 
 			liste.append(element);
@@ -530,7 +537,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const carte = document.createElement('div');
 		carte.innerText = name;
 		carte.classList.add('carte-joueur');
-		let id = 'carte-non-hote';
+		let id = name;
 		if (estHote) {
 			id = 'carte-hote';
 		}
@@ -538,12 +545,26 @@ document.addEventListener('DOMContentLoaded', () => {
 		return carte;
 	}
 
-	function afficherListeJoueurs(id, hote) {
+	function afficherListeJoueurs(id, hote, invitations) {
 		const listeCartes = document.querySelector('#game-content #liste-cartes');
 		listeCartes.innerHTML = '';
+		const autresJoueur = document.createElement('div');
+		autresJoueur.id = 'cartes-autres';
 		for (let joueur of partiesStupideVautour[id]) {
-			listeCartes.append(creerCarteJoueur(joueur, hote === joueur));
+			if (joueur === hote && !document.getElementById('carte-hote')) {
+				listeCartes.append(creerCarteJoueur(joueur, true));
+			} else if (joueur !== hote && !document.getElementById(joueur)) {
+				autresJoueur.append(creerCarteJoueur(joueur, false));
+			}
 		}
+		for (let inv of invitations) {
+			if (inv != undefined) {
+				const invit = creerCarteJoueur(inv, false);
+				invit.classList.add('carte-attente');
+				autresJoueur.append(invit);
+			}
+		}
+		listeCartes.append(autresJoueur);
 		// carte pour ajouter un joueur
 		if (hote === utilisateurActuel) {
 			const nouveauJoueur = document.createElement('div');
