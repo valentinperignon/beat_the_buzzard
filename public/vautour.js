@@ -119,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Réception d'une invitation à une partie de "Stupide Vautour"
 	 */
 	sock.on('vautour-invitation', data => {
-		console.log("Invitation reçue");
 		switch (data.type) {
 			case 'ask':
 				// affichage d'une popup
@@ -174,7 +173,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		partiesStupideVautour[data.id] = new Set(data.liste);
 
 		// Mettre à jour la liste affichée
-		console.log(document.querySelector('#game-content #liste-cartes'));
 		if (document.querySelector('#game-content #liste-cartes')) {
 			afficherListeJoueurs(data.id, data.hote);
 		}
