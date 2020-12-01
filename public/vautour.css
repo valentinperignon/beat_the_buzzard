@@ -161,12 +161,13 @@ input[type='radio']:checked + div {
 }
 
 #logScreen {
-	background: rgba(200, 200, 200, 0.8);
+	background: rgba(200, 200, 200, 1);
 	position: absolute;
 	top: 0;
 	left: 0;
 	width: 100vw;
 	height: 100vh;
+	z-index: 10;
 }
 #logScreen > div {
 	text-align: center;
@@ -249,15 +250,18 @@ input[type='radio']:checked + div {
 	margin: 3px;
 }
 
-#content main .mp,  #game aside #messages .mp {
+#content main .mp,
+#game aside #messages .mp {
 	color: darkblue;
 }
 
-#content main .moi, #game aside #messages .moi {
+#content main .moi,
+#game aside #messages .moi {
 	color: green;
 }
 
-#content main .system, #game aside #messages .system {
+#content main .system,
+#game aside #messages .system {
 	color: orange;
 }
 
@@ -425,7 +429,7 @@ input[type='radio']:checked + #game {
 }
 
 #game aside #messages .system {
-	width:100%;
+	width: 100%;
 }
 
 #game aside #messages div p {
@@ -434,14 +438,12 @@ input[type='radio']:checked + #game {
 	padding: 1rem;
 	margin: 0.7rem 3px;
 	background-color: rgba(226, 221, 221, 0.8);
-	box-shadow: 2px  2px 3px 1px grey ;
-	
+	box-shadow: 2px 2px 3px 1px grey;
 }
 
 #game aside #messages div p b {
-	font-weight:bold;
+	font-weight: bold;
 }
-
 
 #game aside #send-messages {
 	position: absolute;
@@ -452,7 +454,7 @@ input[type='radio']:checked + #game {
 
 #game aside #message {
 	position: relative;
-	height:2rem;
+	height: 2rem;
 	border-radius: 30px;
 	padding: 5%;
 	margin-top: 5%;
@@ -460,7 +462,7 @@ input[type='radio']:checked + #game {
 	border: 1px grey solid;
 	background-color: #e4e3e3;
 	text-align: left;
-	width : 82%;
+	width: 82%;
 	min-width: 30%;
 }
 
@@ -482,14 +484,14 @@ input[type='radio']:checked + #game {
 }
 
 #game aside #labEnvoyer:hover #envoyer {
-    animation: moveArrow 0.75s;
+	animation: moveArrow 0.75s;
 }
 
 #game main #liste-cartes {
 	display: flex;
 	position: absolute;
 	top: 70%;
-	width:70%;
+	width: 70%;
 	justify-content: center;
 }
 
@@ -505,9 +507,9 @@ input[type='radio']:checked + #game {
 }
 
 #game main #liste-cartes #joueur-moi::before {
-	content:"👑";
-	position:absolute;
-	top:2%;
+	content: '👑';
+	position: absolute;
+	top: 2%;
 	font-size: Larger;
 }
 
@@ -539,12 +541,11 @@ input[type='radio']:checked + #game {
 	cursor: pointer;
 }
 
-
 #game #annulerBtn {
 	position: absolute;
 	top: 0%;
-	left : 0%;
-	padding:  0.7rem;
+	left: 0%;
+	padding: 0.7rem;
 	color: white;
 }
 
@@ -554,14 +555,15 @@ input[type='radio']:checked + #game {
 	border-radius: 0% 0% 40% 0%;
 }
 
-button:hover, input[type=button]:hover, btn:hover {
+button:hover,
+input[type='button']:hover,
+btn:hover {
 	cursor: pointer;
 }
 
-
 /* bouton pour lancer une partie */
 #game main #jouerBtn {
-	display:none;
+	display: none;
 }
 
 /* css anim arrow button */
@@ -570,77 +572,76 @@ button:hover, input[type=button]:hover, btn:hover {
 	display: none;
 	position: absolute;
 	top: 25%;
-	left: calc((70% - 14rem)/2);
+	left: calc((70% - 14rem) / 2);
 	width: 14rem;
-    display: inline-flex;
-    color: #fff;
-	padding:  2.5rem;
+	display: inline-flex;
+	color: #fff;
+	padding: 2.5rem;
 	border-radius: 50%;
-    align-items: center;
-    background-color: rgb(146, 180, 245);
-    box-shadow: 5px 6px 10px -5px rgba(0,100,150,0.75);
+	align-items: center;
+	background-color: rgb(146, 180, 245);
+	box-shadow: 5px 6px 10px -5px rgba(0, 100, 150, 0.75);
 }
 .button:hover {
 	transform: scale(1.05);
 	transition: transform 0.2s ease-in;
 	cursor: pointer;
-}  
+}
 
 .button::before {
-    transform: scaleX(0);
-    transform-origin: 0 50%;
-    z-index: -1;
-    transition: transform 0.750s;
+	transform: scaleX(0);
+	transform-origin: 0 50%;
+	z-index: -1;
+	transition: transform 0.75s;
 }
-    
+
 .button span {
-    display: inline-flex;
-    align-items: center;
+	display: inline-flex;
+	align-items: center;
 	justify-content: center;
 	margin-left: 2rem;
-    padding: 0rem 1rem;
-    overflow: visible;
-    height: 100%;
-} 
+	padding: 0rem 1rem;
+	overflow: visible;
+	height: 100%;
+}
 
-.button span::after{
-    position: absolute;
-    left : 1rem;
-	content:'Lancer la partie';
+.button span::after {
+	position: absolute;
+	left: 1rem;
+	content: 'Lancer la partie';
 	font-size: larger;
-    width: 100%;
+	width: 100%;
 }
 
 .button svg {
 	margin-left: 4.7rem;
 	min-width: 40px;
 	min-height: 18px;
-    max-height: 18px;
-    fill: white;
+	max-height: 18px;
+	fill: white;
 }
 
 .button:hover::before {
-    transform: scaleX(1);
+	transform: scaleX(1);
 }
-        
+
 .button:hover svg {
-    animation: moveArrow 0.750s;
+	animation: moveArrow 0.75s;
 }
 
 @keyframes moveArrow {
-    
-    0% {
-        transform: translateX(0px);
-    }
-    49% {
-        transform: translateX(30px);
-    }
-    50% {
-        transform: translateX(-15px);
-    }
-    100% {
-        transform: translateX(0px);
-    }   
+	0% {
+		transform: translateX(0px);
+	}
+	49% {
+		transform: translateX(30px);
+	}
+	50% {
+		transform: translateX(-15px);
+	}
+	100% {
+		transform: translateX(0px);
+	}
 }
 
 /* -------------------- Popup -------------------- */
@@ -652,4 +653,25 @@ button:hover, input[type=button]:hover, btn:hover {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+}
+
+/* -------------------- Synthèse vocale -------------------- */
+
+button#syntheseBtn {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+}
+
+#syntheseParam {
+	display: none;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background-color: white;
+}
+
+#syntheseParam.afficherFenetre {
+	display: block;
 }
