@@ -24,7 +24,6 @@ describe("Gestion des joueurs", function() {
         scores = JSON.parse(chifoumi.scoresJSON());
         assert.strictEqual(scores.fred, undefined);
     });
-    
 });
 
 describe("Gestion des défis", function() {

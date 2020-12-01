@@ -54,7 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			input: document.querySelector('#game aside #send-messages #message'),
 			btnSend: document.querySelector('#game aside #send-messages #envoyer'),
 		},
-	};
+  };
+  
+  // synthèse vocale
+  let syntheseVocale = true;
 
 	/* -------------------- Réception des messages du serveur -------------------- */
 
@@ -95,7 +98,14 @@ document.addEventListener('DOMContentLoaded', () => {
 	 */
 	sock.on('message', msg => {
 		if (utilisateurActuel) {
-			afficherMessage(msg);
+      afficherMessage(msg);
+      
+      if (!syntheseVocale || typeof(speechSynthesis) === 'undefined' || msg.from === utilisateurActuel) return;
+      if (msg.from === '[admin]') msg.from = 'admin';
+      
+      let hearThis = new SpeechSynthesisUtterance(`Nouveau message de : ${msg.from}: ${msg.text}.`);
+      hearThis.lang = 'fr-FR';
+      speechSynthesis.speak(hearThis);
 		}
 	});
 
