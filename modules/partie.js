@@ -34,7 +34,7 @@ function addCard(val) {
 /**
  * Play a turn of the game
  */
-function playTurn() {}
+function playTurn() { }
 
 /**
  * return a JSON object which contains all the players' scores
@@ -87,11 +87,20 @@ function initGame(playersNames) {
  * Remove a real player to replace it by an AI
  *
  * @param {String} p The player to replace by an AI
+ * @param {array} playersList The array of player 
  */
-function removePlayer(p) {
+function removePlayer(p, playersList) {
 	if (!playersList[p]) return -1;
 	playersList[p].setName('IA');
 	playersList[p].setAI();
+
+	// If all the players are AI, end the game
+	for (let p of playersList) {
+		if (p.getName() != 'IA') {
+			return;
+		}
+	}
+	endGame();
 }
 
 function endGame() {
@@ -104,6 +113,7 @@ module.exports = {
 	getTopPile,
 	playTurn,
 	getPlayersList,
+	addPlayer,
 	removePlayer,
 	getNumTurn,
 	addCard,

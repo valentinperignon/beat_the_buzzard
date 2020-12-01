@@ -504,7 +504,7 @@ input[type='radio']:checked + #game {
 	word-break: break-all;
 }
 
-#game main #liste-cartes #joueur-moi::before {
+#game main #liste-cartes #carte-hote::before {
 	content:"👑";
 	position:absolute;
 	top:2%;
@@ -647,9 +647,35 @@ button:hover, input[type=button]:hover, btn:hover {
 
 #popup {
 	display: block;
-	width: 300px;
+	width: 25%;
+	min-width: 300px;
+	max-width: 350px;
 	position: absolute;
+	text-align: center;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+}
+
+#popup p {
+	width: 100%;
+}
+
+#popup button {
+	min-width: 60px;
+	min-height: 35px;
+	border-radius: 12px;
+	margin: 1em;
+	margin-top: 2em;
+}
+
+#popup button:first-of-type {
+	background-color: rgba(245, 247, 244, 0.897);
+	color: rgba(39, 35, 35, 0.8);
+	border: rgba(39, 35, 35, 0.8), 1px, solid;
+}
+
+#popup button:last-of-type {
+	background-color: rgba(39, 35, 35, 0.8);
+	color:  rgba(245, 247, 244, 0.897);
 }

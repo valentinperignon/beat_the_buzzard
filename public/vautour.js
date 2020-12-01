@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Réception d'une invitation à une partie de "Stupide Vautour"
 	 */
 	sock.on('vautour-invitation', data => {
+		console.log("Invitation reçue");
 		switch (data.type) {
 			case 'ask':
 				// affichage d'une popup
@@ -141,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 						const listeHTML = document.createElement('div');
 						listeHTML.setAttribute('id', 'liste-cartes');
-						UIGame.game.appendChild(listeHTML);
+						UIGame.game.append(listeHTML);
 					} else if (e.target.innerText === 'Refuser') {
 						toSend.answer = false;
 					}
@@ -175,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		// Mettre à jour la liste affichée
 		console.log(document.querySelector('#game-content #liste-cartes'));
 		if (document.querySelector('#game-content #liste-cartes')) {
-			afficherListeJoueurs(data.id);
+			afficherListeJoueurs(data.id, data.hote);
 		}
 	});
 
@@ -210,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (confirm('Quitter le chat ?')) {
 			// Vide le contenu des chats
 			nettoyer();
-			sock.emit('logout');
+			sock.emit('logout', Object.keys(partiesStupideVautour));
 			UIConnexion.radio.checked = true;
 		}
 	}
@@ -442,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		annulerBouton.innerText = 'Retour';
 		annulerBouton.setAttribute('id', 'annulerBtn');
 		annulerBouton.addEventListener('click', () => {
-			sock.emit('vautour', { status: 'cancel' });
+			sock.emit('vautour-annuler', { id: partieActuelle, from: utilisateurActuel });
 		});
 		UIGame.game.append(annulerBouton);
 
@@ -452,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		UIGame.game.append(listeCartes);
 
 		// carte moi
-		listeCartes.append(creerCarteJoueur(utilisateurActuel, 'joueur-moi'));
+		listeCartes.append(creerCarteJoueur(utilisateurActuel, true));
 
 		// cartes des autres joueurs
 		const autresJoueurs = document.createElement('div');
@@ -503,8 +504,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				UIGame.game.removeChild(liste);
 				document
 					.getElementById('cartes-autres')
-					.append(creerCarteJoueur(utilisateur, utilisateur));
-				document.getElementById(utilisateur).classList.add('carte-attente');
+					.append(creerCarteJoueur(utilisateur, false));
+				document.getElementById('carte-non-hote').classList.add('carte-attente');
 			});
 
 			liste.append(element);
@@ -525,21 +526,33 @@ document.addEventListener('DOMContentLoaded', () => {
 	/**
 	 * Créer une carte représentant un joueur
 	 * @param {string} name nom du joueur
-	 * @param {string} id id de la carte
+	 * @param {boolean} estHote indique si le joueur est l'hôte de la partie
 	 */
-	function creerCarteJoueur(name, id) {
+	function creerCarteJoueur(name, estHote) {
 		const carte = document.createElement('div');
 		carte.innerText = name;
 		carte.classList.add('carte-joueur');
+		let id = 'carte-non-hote';
+		if (estHote) {
+			id = 'carte-hote';
+		}
 		carte.setAttribute('id', id);
 		return carte;
 	}
 
-	function afficherListeJoueurs(id) {
+	function afficherListeJoueurs(id, hote) {
 		const listeCartes = document.querySelector('#game-content #liste-cartes');
 		listeCartes.innerHTML = '';
 		for (let joueur of partiesStupideVautour[id]) {
-			listeCartes.append(creerCarteJoueur(joueur, joueur));
+			listeCartes.append(creerCarteJoueur(joueur, hote === joueur));
+		}
+		// carte pour ajouter un joueur
+		if (hote === utilisateurActuel) {
+			const nouveauJoueur = document.createElement('div');
+			nouveauJoueur.innerText = '+';
+			nouveauJoueur.classList.add('carte-joueur');
+			nouveauJoueur.addEventListener('click', ajouterJoueur);
+			listeCartes.append(nouveauJoueur);
 		}
 	}
 
