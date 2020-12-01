@@ -494,7 +494,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			element.addEventListener('click', () => {
 				// ajouter l'utilisateur à la liste de joueurs
 				partiesStupideVautour[partieActuelle].add(utilisateur);
-
 				// envoyer l'invitation
 				sock.emit('vautour-invitation', {
 					type: 'ask',
@@ -511,11 +510,14 @@ document.addEventListener('DOMContentLoaded', () => {
 						.append(creerCarteJoueur(utilisateur, false));
 					document.getElementById(utilisateur).classList.add('carte-attente');
 				}
+				if (partiesStupideVautour[partieActuelle].size >= 4) {
+					document.getElementById('liste-cartes').lastChild.remove();
+				}
 			});
 
 			liste.append(element);
-		}
 
+		}
 		// afficher un message si aucun joueur ne peut être ajouté
 		if (!canAddUsers) {
 			const aucunJoueur = document.createElement('li');
@@ -566,7 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 		listeCartes.append(autresJoueur);
 		// carte pour ajouter un joueur
-		if (hote === utilisateurActuel) {
+		if (hote === utilisateurActuel && (partiesStupideVautour[partieActuelle].size + invitations.length < 5)) {
 			const nouveauJoueur = document.createElement('div');
 			nouveauJoueur.innerText = '+';
 			nouveauJoueur.classList.add('carte-joueur');
