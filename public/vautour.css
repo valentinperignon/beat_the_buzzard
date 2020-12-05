@@ -507,9 +507,9 @@ input[type='radio']:checked + #game {
 }
 
 #game main #liste-cartes #carte-hote::before {
-	content:"👑";
-	position:absolute;
-	top:2%;
+	content: '👑';
+	position: absolute;
+	top: 2%;
 	font-size: Larger;
 }
 
@@ -659,7 +659,6 @@ btn:hover {
 	transform: translate(-50%, -50%);
 }
 
-
 #popup p {
 	width: 100%;
 }
@@ -680,7 +679,7 @@ btn:hover {
 
 #popup button:last-of-type {
 	background-color: rgba(39, 35, 35, 0.8);
-	color:  rgba(245, 247, 244, 0.897);
+	color: rgba(245, 247, 244, 0.897);
 }
 
 /* -------------------- Synthèse vocale -------------------- */

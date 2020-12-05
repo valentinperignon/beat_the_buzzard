@@ -62,7 +62,7 @@ function envoyerListeVautour(id) {
 				id: id,
 				liste: partieVautour.getPlayersList(id),
 				hote: partieVautour.getHost(id),
-				invitations: partieVautour.getInvite(id)
+				invitations: partieVautour.getInvite(id),
 			});
 		}
 	}
@@ -247,9 +247,9 @@ io.on('connection', function (socket) {
 			if (data.type === 'answer') {
 				if (data.answer) {
 					partieVautour.addPlayer(data.id, data.from);
-					console.log("Joueurs de la partie " + data.id + " :");
+					console.log('Joueurs de la partie ' + data.id + ' :');
 					for (let j of partieVautour.getPlayersList(data.id)) {
-						console.log(" " + j + " ");
+						console.log(' ' + j + ' ');
 					}
 				}
 				partieVautour.removeInvite(data.id, data.from);
@@ -258,7 +258,7 @@ io.on('connection', function (socket) {
 				partieVautour.addInvite(data.id, data.to); // stocke l'invitation
 			}
 		}
-		console.log("nb invitation : " + partieVautour.getNbInvite(data.id) + "\n");
+		console.log('nb invitation : ' + partieVautour.getNbInvite(data.id) + '\n');
 	});
 
 	/**
@@ -296,10 +296,7 @@ io.on('connection', function (socket) {
 			// désinscription du client
 			currentID = null;
 			// envoi de la nouvelle liste pour mise à jour
-			socket.broadcast.emit(
-				'liste',
-				scores
-			);
+			socket.broadcast.emit('liste', scores);
 		}
 	});
 
@@ -323,10 +320,7 @@ io.on('connection', function (socket) {
 			// désinscription du client
 			currentID = null;
 			// envoi de la nouvelle liste pour mise à jour
-			socket.broadcast.emit(
-				'liste',
-				scores
-			);
+			socket.broadcast.emit('liste', scores);
 		}
 		console.log('Client déconnecté');
 	});

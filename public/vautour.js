@@ -497,7 +497,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		annulerBouton.innerText = 'Retour';
 		annulerBouton.setAttribute('id', 'annulerBtn');
 		annulerBouton.addEventListener('click', () => {
-			sock.emit('vautour-annuler', { id: partieActuelle, from: utilisateurActuel });
+			sock.emit('vautour-annuler', {
+				id: partieActuelle,
+				from: utilisateurActuel,
+			});
 		});
 		UIGame.game.append(annulerBouton);
 
