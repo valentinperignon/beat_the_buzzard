@@ -1,18 +1,15 @@
 default:
   image: node
 
-build-job:
-  stage: build
-  script:
-    - npm install
-
-test-check-code:
+check-code:
   stage: test
   script:
+    - npm install
     - npm run lint
     - npm run format:check
 
 test:
   stage: test
   script:
+    - npm install
     - npm test
