@@ -1,13 +1,22 @@
 /********************************************************************
  *   Module implementing a game of 'Stupides Vautours'
  ********************************************************************/
+
 let games = {};
+let maxId = 0;
+
+function Player(name, isAI = false) {
+	this.name = name;
+	this.isAI = isAI;
+	this.score = 0;
+	this.hand = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+}
 
 /************** Funtions for the lobby creation, add players... */
-function createGame(id, host) {
-	if (id == null) {
-		return false;
-	}
+
+function createGame(host) {
+	const id = maxId;
+	maxId += 1;
 
 	games[id] = {
 		host: host,
@@ -16,45 +25,38 @@ function createGame(id, host) {
 		isLaunched: false,
 		pile: [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
 		chosenCards: [],
-		numTurn: 1
+		numTurn: 1,
 	};
-	addPlayer(id, host);
+	games[id].playersList[host] = new Player(host);
+
+	return id;
 }
 
 function addInvite(id, player) {
-	if (id == null) {
-		return false;
-	}
+	if (!games[id] || games[id].invitations.includes(player)) return false;
 
 	games[id].invitations.push(player);
+	return true;
 }
 
 function removeInvite(id, player) {
-	if (id == null || games[id] == undefined) {
-		return false;
-	}
+	if (!games[id] || !games[id].invitations.includes(player)) return false;
 	games[id].invitations.splice(games[id].invitations.indexOf(player), 1);
+	return true;
 }
 
 function isInvited(id, player) {
-	if (id == null) {
-		return false;
-	}
-
+	if (!games[id]) return false;
 	return games[id].invitations.includes(player);
 }
 
 function getNbInvite(id) {
-	if (id == null) {
-		return false;
-	}
+	if (!games[id]) return 0;
 	return games[id].invitations.length;
 }
 
 function getInvite(id) {
-	if (id == null) {
-		return false;
-	}
+	if (!games[id]) return null;
 	return games[id].invitations;
 }
 
@@ -66,12 +68,9 @@ function getPlayersList(id) {
 }
 
 function getHost(id) {
-	if (id == null) {
-		return false;
-	}
+	if (!games[id]) return null;
 	return games[id].host;
 }
-
 
 /**
  * Add a player in the list
@@ -81,16 +80,10 @@ function getHost(id) {
  * @param {boolean} isAI Boolean to know if the player is an AI
  */
 function addPlayer(id, name, isAI = false) {
-	if (id == null) {
-		return false;
-	}
-	games[id].playersList[name] =
-	{
-		name: name,
-		isAI: isAI,
-		score: 0,
-		hand: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-	};
+	if (!games[id] || (!isAI && !isInvited(id, name))) return false;
+
+	games[id].playersList[name] = new Player(name, isAI);
+	return true;
 }
 
 function getPlayerGames(player) {
@@ -115,7 +108,8 @@ function removePlayer(id, p) {
 	}
 	let players = games[id].playersList;
 	if (!players[p]) return -1;
-	if (!games[id].isLaunched) { // If the game hasn't started yet, delete the player and make another player host if the player to delete was the host
+	if (!games[id].isLaunched) {
+		// If the game hasn't started yet, delete the player and make another player host if the player to delete was the host
 		delete players[p];
 		if (p === games[id].host) {
 			for (let player in players) {
@@ -123,7 +117,8 @@ function removePlayer(id, p) {
 					games[id].host = player;
 			}
 		}
-	} else { // If the game has already started, replace the player by an AI
+	} else {
+		// If the game has already started, replace the player by an AI
 		players[p].name = 'IA';
 		players[p].isAI = true;
 	}
@@ -136,7 +131,6 @@ function removePlayer(id, p) {
 	}
 	endGame(games[id]);
 }
-
 
 /****************  Functions for the game itself  *******************/
 
@@ -166,11 +160,11 @@ function addCard(val, id) {
 /**
  * Play a turn of the game
  */
-function playTurn() { }
+function playTurn() {}
 
 /**
  * return a JSON object which contains all the players' scores
- * 
+ *
  * @param id The id of the game
  */
 function getScores(id) {
@@ -190,7 +184,7 @@ function getScores(id) {
 
 /**
  * shuffle the set of cards
- * 
+ *
  * @param id The id of the game
  */
 function shuffleCards(id) {
@@ -203,11 +197,10 @@ function shuffleCards(id) {
 		.map(n => n.value);
 }
 
-
 /**
  * Initialize a game but adding the player to the list and shuffling the card's pile
  *
- * @param id The id of the game 
+ * @param id The id of the game
  */
 function initGame(id) {
 	if (id == null) {
@@ -220,9 +213,9 @@ function initGame(id) {
 	shuffleCards();
 }
 
-
 function endGame(game) {
-	console.log("TO-DO : end the game and return the winner");
+	console.log(game);
+	console.log('TO-DO : end the game and return the winner');
 }
 
 module.exports = {
