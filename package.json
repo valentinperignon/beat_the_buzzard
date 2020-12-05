@@ -19,7 +19,7 @@
 		"format": "prettier -w .",
 		"lint": "eslint .",
 		"format:check": "prettier -c .",
-		"coverage": "nyc mocha modules/partie.test.js"
+		"coverage": "nyc --reporter=text-summary mocha modules/partie.test.js"
 	},
 	"author": "Fabian Devel, Valentin Perignon",
 	"license": "ISC"
