@@ -55,6 +55,17 @@ document.addEventListener('DOMContentLoaded', () => {
 			btnSend: document.querySelector('#game aside #send-messages #envoyer'),
 		},
 	};
+	const UIVoix = {
+		activer: document.getElementById('syntheseBtn'),
+		popup: document.getElementById('syntheseParam'),
+		check: document.querySelector('#syntheseParam #mute'),
+		volume: document.querySelector('#syntheseParam #volume'),
+		fermer: document.querySelector('#syntheseParam button'),
+	};
+
+	// synthèse vocale
+
+	let syntheseVocale = null;
 
 	/* -------------------- Réception des messages du serveur -------------------- */
 
@@ -96,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	sock.on('message', msg => {
 		if (utilisateurActuel) {
 			afficherMessage(msg);
+			readMessage(msg);
 		}
 	});
 
@@ -351,11 +363,46 @@ document.addEventListener('DOMContentLoaded', () => {
 				msg.scrollIntoView();
 			}
 		} else {
-			let msg = document.querySelector('#game > aside > #messages > p:last-child');
+			let msg = document.querySelector(
+				'#game > aside > #messages > p:last-child'
+			);
 			if (msg != null) {
 				msg.scrollIntoView();
 			}
 		}
+	}
+
+	/**
+	 * Lire un message avec la synthèse vocale
+	 * @param object msg { from: auteur, text: texte du message, date: horodatage (ms) }
+	 */
+	function readMessage(msg) {
+		if (syntheseVocale === null) {
+			syntheseVocale = JSON.parse(
+				localStorage.getItem(`voice_${utilisateurActuel}`)
+			);
+			if (syntheseVocale === null) {
+				// valeur par défaut
+				syntheseVocale = {
+					active: true,
+					volume: 0.2,
+				};
+			}
+		}
+
+		if (
+			!syntheseVocale.active ||
+			typeof speechSynthesis === 'undefined' ||
+			msg.from.startsWith(utilisateurActuel) ||
+			msg.from === '[admin]'
+		) {
+			return;
+		}
+
+		let hearThis = new SpeechSynthesisUtterance(`${msg.from} dit ${msg.text}`);
+		hearThis.lang = 'fr-FR';
+		hearThis.volume = syntheseVocale.volume;
+		speechSynthesis.speak(hearThis);
 	}
 
 	// traitement des emojis
@@ -436,10 +483,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		jouerBouton.innerText = 'Lancer la partie';
 		jouerBouton.setAttribute('id', 'jouerBtn');
 		UIGame.game.append(jouerBouton);
-		UIGame.game.insertAdjacentHTML("afterbegin",
+		UIGame.game.insertAdjacentHTML(
+			'afterbegin',
 			'<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs><symbol id="arrow" viewBox="0 0 100 100"><path d="M12.5 45.83h64.58v8.33H12.5z"/><path d="M59.17 77.92l-5.84-5.84L75.43 50l-22.1-22.08 5.84-5.84L87.07 50z"/></symbol></defs></svg>'
 		);
-		UIGame.game.insertAdjacentHTML("beforeend", '<label for="jouerBtn" class="button"><span><svg><use xlink:href="#arrow" href="#arrow"></use></svg></span></label >');
+		UIGame.game.insertAdjacentHTML(
+			'beforeend',
+			'<label for="jouerBtn" class="button"><span><svg><use xlink:href="#arrow" href="#arrow"></use></svg></span></label >'
+		);
 
 		// bouton pour annuler la partie
 		const annulerBouton = document.createElement('btn');
@@ -590,6 +641,32 @@ document.addEventListener('DOMContentLoaded', () => {
 	UIChat.users.addEventListener('click', e => {
 		UIChat.input.value += `@${e.target.innerText}`;
 	});
+	UIVoix.activer.addEventListener('click', () => {
+		if (!utilisateurActuel) return;
+		UIVoix.popup.classList.add('afficherFenetre');
+		UIVoix.check.checked = syntheseVocale.active;
+		UIVoix.volume.value = syntheseVocale.volume * 10;
+	});
+	UIVoix.popup.addEventListener('click', ev => {
+		if (!utilisateurActuel) return;
+		let target = ev.target;
+
+		switch (target) {
+			case UIVoix.fermer:
+				UIVoix.popup.classList.remove('afficherFenetre');
+				localStorage.setItem(
+					`voice_${utilisateurActuel}`,
+					JSON.stringify(syntheseVocale)
+				);
+				break;
+			case UIVoix.volume:
+				syntheseVocale.volume = UIVoix.volume.value / 10;
+				break;
+			case UIVoix.check:
+				syntheseVocale.active = UIVoix.check.checked;
+				break;
+		}
+	});
 
 	// --> keydown
 
@@ -608,24 +685,23 @@ document.addEventListener('DOMContentLoaded', () => {
 	function addKeyListerners(UI) {
 		UI.input.addEventListener('keydown', e => {
 			switch (e.key) {
-				case "Tab": // tabulation
+				case 'Tab': // tabulation
 					e.preventDefault(); // empêche de perdre le focus
 					completion.next();
 					break;
-				case "ArrowUp": // fleche haut
+				case 'ArrowUp': // fleche haut
 					e.preventDefault(); // empêche de faire revenir le curseur au début du texte
 					historique.precedent();
 					break;
-				case "ArrowDown": // fleche bas
+				case 'ArrowDown': // fleche bas
 					e.preventDefault(); // par principe
 					historique.suivant();
 					break;
-				case "Enter": // touche entrée
+				case 'Enter': // touche entrée
 					envoyer(UI.input);
 				default:
 					completion.reset();
 			}
 		});
 	}
-
 });

@@ -5,10 +5,11 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Chat - Stupide Vautour</title>
 		<link rel="stylesheet" href="./vautour.css" />
-		<link rel="preconnect"
-			  href="https://fonts.gstatic.com">
-		<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap"
-			  rel="stylesheet">
+		<link rel="preconnect" href="https://fonts.gstatic.com" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap"
+			rel="stylesheet"
+		/>
 		<script src="/socket.io/socket.io.js"></script>
 		<script src="./vautour.js"></script>
 	</head>
@@ -56,10 +57,21 @@
 				<div id="messages"></div>
 				<div id="send-messages">
 					<input type="text" id="message" />
-					<label for="envoyer" id="labEnvoyer"><input type="button" value="➤" id="envoyer" /></label>
-				
+					<label for="envoyer" id="labEnvoyer"
+						><input type="button" value="➤" id="envoyer"
+					/></label>
 				</div>
 			</aside>
+		</div>
+
+		<!-- Synthèse vocale -->
+		<button id="syntheseBtn">Synthèse vocale</button>
+		<div id="syntheseParam">
+			<label for="mute">Activer la synthèse vocale</label>
+			<input type="checkbox" name="mute" id="mute" value="mute" />
+			<label for="volume">Volume</label>
+			<input type="range" name="volume" id="volume" min="0" max="10" />
+			<button>Fermer</button>
 		</div>
 	</body>
 </html>
