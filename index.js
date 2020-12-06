@@ -30,7 +30,6 @@ var clients = {}; // { id -> socket, ... }
 
 // Module contenant les parties de stupides vautours
 var partieVautour = require('./modules/partie');
-var indexParties = 0;
 var scores = {};
 
 /**
@@ -43,7 +42,9 @@ function supprimer(name, tabID) {
 	delete scores[name];
 	if (tabID != undefined && tabID instanceof Array && tabID.length != 0) {
 		for (let id of tabID) {
-			partieVautour.removePlayer(id, name);
+			// Supprime le joueur dans toutes les parties auquelles il jouait
+			let err = partieVautour.removePlayer(id, name);
+			console.log('Suppression du joueur ' + name + ' retour : ' + err);
 			envoyerListeVautour(id);
 		}
 	}
@@ -221,14 +222,13 @@ io.on('connection', function (socket) {
 	 * Création d'une partie de Stupide Vautour
 	 */
 	socket.on('vautour-creer', from => {
-		partieVautour.createGame(indexParties, from);
+		let numPartie = partieVautour.createGame(from);
 		// log
 		console.log(
-			`Création d'une partie de Stupide Vautour par ${from} (numéro ${indexParties})`
+			`Création d'une partie de Stupide Vautour par ${from} (numéro ${numPartie})`
 		);
 		// retourner le numéro de la partie
-		socket.emit('vautour-creer', indexParties);
-		indexParties++;
+		socket.emit('vautour-creer', numPartie);
 	});
 
 	/**
@@ -246,7 +246,8 @@ io.on('connection', function (socket) {
 			// traitement si invitation acceptée
 			if (data.type === 'answer') {
 				if (data.answer) {
-					partieVautour.addPlayer(data.id, data.from);
+					let err = partieVautour.addPlayer(data.id, data.from);
+					console.log('Ajout du joueur : ' + data.from + ' retour : ' + err);
 					console.log('Joueurs de la partie ' + data.id + ' :');
 					for (let j of partieVautour.getPlayersList(data.id)) {
 						console.log(' ' + j + ' ');

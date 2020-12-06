@@ -104,10 +104,10 @@ function getPlayerGames(player) {
  */
 function removePlayer(id, p) {
 	if (id == null) {
-		return false;
+		return -1;
 	}
 	let players = games[id].playersList;
-	if (!players[p]) return -1;
+	if (!players[p]) return -2;
 	if (!games[id].isLaunched) {
 		// If the game hasn't started yet, delete the player and make another player host if the player to delete was the host
 		delete players[p];
@@ -126,10 +126,11 @@ function removePlayer(id, p) {
 	// If all the players are AI, end the game
 	for (let p in players) {
 		if (!players[p].isAI) {
-			return;
+			return true;
 		}
 	}
 	endGame(games[id]);
+	return false;
 }
 
 /****************  Functions for the game itself  *******************/
