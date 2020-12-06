@@ -184,6 +184,18 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
+	sock.on('partie-annule', () => {
+		const popup = document.createElement('div');
+		document.body.appendChild(popup);
+		popup.setAttribute('id', 'popup');
+		popup.innerHTML = `<p>La partie que vous tentez de rejoindre n'existe plus...</p><button>Fermer</button>`;
+		popup.addEventListener('click', () => {
+			document.body.removeChild(document.getElementById('popup'));
+		});
+		UIGame.radio.checked = false;
+		UIChat.radio.checked = true;
+	});
+
 	sock.on('vautour-liste', data => {
 		console.log('recu liste joueur');
 		partiesStupideVautour[data.id] = new Set(data.liste);

@@ -56,7 +56,11 @@ function supprimer(name, tabID) {
  * @param id Identifiant de la partie
  */
 function envoyerListeVautour(id) {
-	for (let j of partieVautour.getPlayersList(id)) {
+	let players = partieVautour.getPlayersList(id);
+	if (players === false) {
+		return;
+	}
+	for (let j of players) {
 		// envoie la nouvelle liste aux joueurs de la parties
 		if (clients[j] !== undefined) {
 			clients[j].emit('vautour-liste', {
@@ -241,10 +245,19 @@ io.on('connection', function (socket) {
 		);
 		// transmettre l'invitation
 		if (!partieVautour.isInvited(data.id, data.to)) {
-			clients[data.to].emit('vautour-invitation', data);
-
 			// traitement si invitation acceptée
 			if (data.type === 'answer') {
+				data.to = partieVautour.getHost(data.id);
+				console.log(data.to);
+				// S'il n'y a plus d'hote on annule toute les invitations
+				if (data.to == undefined) {
+					partieVautour.removeInvite(data.id, data.from);
+					// envoi d'une popup avertissant le joueur invité
+					clients[data.from].emit('partie-annule');
+					console.log('aaa');
+					return;
+				}
+				console.log('bb');
 				if (data.answer) {
 					let err = partieVautour.addPlayer(data.id, data.from);
 					console.log('Ajout du joueur : ' + data.from + ' retour : ' + err);
@@ -258,6 +271,7 @@ io.on('connection', function (socket) {
 			} else {
 				partieVautour.addInvite(data.id, data.to); // stocke l'invitation
 			}
+			clients[data.to].emit('vautour-invitation', data);
 		}
 		console.log('nb invitation : ' + partieVautour.getNbInvite(data.id) + '\n');
 	});

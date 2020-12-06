@@ -61,7 +61,7 @@ function getInvite(id) {
 }
 
 function getPlayersList(id) {
-	if (id == null) {
+	if (!games[id]) {
 		return false;
 	}
 	return Object.keys(games[id].playersList);
@@ -112,9 +112,18 @@ function removePlayer(id, p) {
 		// If the game hasn't started yet, delete the player and make another player host if the player to delete was the host
 		delete players[p];
 		if (p === games[id].host) {
+			let gotNewHost = false;
 			for (let player in players) {
-				if (player != undefined && !players[player].isAI)
+				if (player != undefined && !players[player].isAI) {
 					games[id].host = player;
+					gotNewHost = true;
+					break;
+				}
+			}
+			if (!gotNewHost) {
+				// No host could be selected, stop the game
+				delete games[id];
+				return;
 			}
 		}
 	} else {
