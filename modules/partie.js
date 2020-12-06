@@ -89,7 +89,10 @@ function addPlayer(id, name, isAI = false) {
 function getPlayerGames(player) {
 	let tabGames = [];
 	for (let game in games) {
-		if (Object.keys(games[game].playersList).includes(player)) {
+		if (
+			Object.keys(games[game].playersList).includes(player) ||
+			games[game].invitations.includes(player)
+		) {
 			tabGames.push(game);
 		}
 	}
@@ -107,7 +110,12 @@ function removePlayer(id, p) {
 		return -1;
 	}
 	let players = games[id].playersList;
-	if (!players[p]) return -2;
+	if (!players[p]) {
+		if (!games[id].invitations.includes(p)) {
+			return -2;
+		}
+		games[id].invitations.splice(games[id].invitations.indexOf(p), 1);
+	}
 	if (!games[id].isLaunched) {
 		// If the game hasn't started yet, delete the player and make another player host if the player to delete was the host
 		delete players[p];

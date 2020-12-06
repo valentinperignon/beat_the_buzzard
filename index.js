@@ -43,8 +43,9 @@ function supprimer(name, tabID) {
 	if (tabID != undefined && tabID instanceof Array && tabID.length != 0) {
 		for (let id of tabID) {
 			// Supprime le joueur dans toutes les parties auquelles il jouait
+			console.log('Suppression du joueur ' + name + 'de la partie' + id);
 			let err = partieVautour.removePlayer(id, name);
-			console.log('Suppression du joueur ' + name + ' retour : ' + err);
+			console.log('Statut de la suppression : ' + err);
 			envoyerListeVautour(id);
 		}
 	}
