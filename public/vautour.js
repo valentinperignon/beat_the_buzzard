@@ -570,7 +570,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			});
 
 			liste.append(element);
-
 		}
 		// afficher un message si aucun joueur ne peut être ajouté
 		if (!canAddUsers) {
@@ -622,7 +621,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 		listeCartes.append(autresJoueur);
 		// carte pour ajouter un joueur
-		if (hote === utilisateurActuel && (partiesStupideVautour[partieActuelle].size + invitations.length < 5)) {
+		if (
+			hote === utilisateurActuel &&
+			partiesStupideVautour[partieActuelle].size + invitations.length < 5
+		) {
 			const nouveauJoueur = document.createElement('div');
 			nouveauJoueur.innerText = '+';
 			nouveauJoueur.classList.add('carte-joueur');
