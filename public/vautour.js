@@ -560,7 +560,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			element.addEventListener('click', () => {
 				// ajouter l'utilisateur à la liste de joueurs
 				partiesStupideVautour[partieActuelle].add(utilisateur);
-
 				// envoyer l'invitation
 				sock.emit('vautour-invitation', {
 					type: 'ask',
@@ -584,7 +583,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			liste.append(element);
 		}
-
 		// afficher un message si aucun joueur ne peut être ajouté
 		if (!canAddUsers) {
 			const aucunJoueur = document.createElement('li');
