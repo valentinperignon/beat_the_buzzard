@@ -51,7 +51,7 @@ function supprimer(name, tabID) {
 
 /**
  * Envoie la liste des joueurs d'une partie de Stupide vautour aux joueurs concernés
- *
+ * 
  * @param id Identifiant de la partie
  */
 function envoyerListeVautour(id) {
