@@ -61,7 +61,7 @@ function getInvite(id) {
 }
 
 function getPlayersList(id) {
-	if (id == null) {
+	if (!games[id]) {
 		return false;
 	}
 	return Object.keys(games[id].playersList);
@@ -89,7 +89,10 @@ function addPlayer(id, name, isAI = false) {
 function getPlayerGames(player) {
 	let tabGames = [];
 	for (let game in games) {
-		if (Object.keys(games[game].playersList).includes(player)) {
+		if (
+			Object.keys(games[game].playersList).includes(player) ||
+			games[game].invitations.includes(player)
+		) {
 			tabGames.push(game);
 		}
 	}
@@ -104,17 +107,31 @@ function getPlayerGames(player) {
  */
 function removePlayer(id, p) {
 	if (id == null) {
-		return false;
+		return -1;
 	}
 	let players = games[id].playersList;
-	if (!players[p]) return -1;
+	if (!players[p]) {
+		if (!games[id].invitations.includes(p)) {
+			return -2;
+		}
+		games[id].invitations.splice(games[id].invitations.indexOf(p), 1);
+	}
 	if (!games[id].isLaunched) {
 		// If the game hasn't started yet, delete the player and make another player host if the player to delete was the host
 		delete players[p];
 		if (p === games[id].host) {
+			let gotNewHost = false;
 			for (let player in players) {
-				if (player != undefined && !players[player].isAI)
+				if (player != undefined && !players[player].isAI) {
 					games[id].host = player;
+					gotNewHost = true;
+					break;
+				}
+			}
+			if (!gotNewHost) {
+				// No host could be selected, stop the game
+				delete games[id];
+				return;
 			}
 		}
 	} else {
@@ -126,10 +143,11 @@ function removePlayer(id, p) {
 	// If all the players are AI, end the game
 	for (let p in players) {
 		if (!players[p].isAI) {
-			return;
+			return true;
 		}
 	}
 	endGame(games[id]);
+	return false;
 }
 
 /****************  Functions for the game itself  *******************/

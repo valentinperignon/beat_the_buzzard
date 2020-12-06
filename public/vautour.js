@@ -175,13 +175,29 @@ document.addEventListener('DOMContentLoaded', () => {
 					partiesStupideVautour[partieActuelle].delete(data.from);
 					document
 						.getElementById('cartes-autres')
-						.remove(document.getElementById(data.from));
+						.removeChild(document.getElementById(data.from));
+					if (!document.getElementById('carte-ajout-joueur')) {
+						creerCarteAjouterJoueur();
+					}
 				}
 				break;
 		}
 	});
 
+	sock.on('partie-annule', () => {
+		const popup = document.createElement('div');
+		document.body.appendChild(popup);
+		popup.setAttribute('id', 'popup');
+		popup.innerHTML = `<p>La partie que vous tentez de rejoindre n'existe plus...</p><button>Fermer</button>`;
+		popup.addEventListener('click', () => {
+			document.body.removeChild(document.getElementById('popup'));
+		});
+		UIGame.radio.checked = false;
+		UIChat.radio.checked = true;
+	});
+
 	sock.on('vautour-liste', data => {
+		console.log('recu liste joueur');
 		partiesStupideVautour[data.id] = new Set(data.liste);
 
 		// Mettre à jour la liste affichée
@@ -518,11 +534,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		listeCartes.append(autresJoueurs);
 
 		// carte pour ajouter un joueur
-		const nouveauJoueur = document.createElement('div');
-		nouveauJoueur.innerText = '+';
-		nouveauJoueur.classList.add('carte-joueur');
-		nouveauJoueur.addEventListener('click', ajouterJoueur);
-		listeCartes.append(nouveauJoueur);
+		creerCarteAjouterJoueur();
 	}
 
 	/**
@@ -600,6 +612,20 @@ document.addEventListener('DOMContentLoaded', () => {
 		return carte;
 	}
 
+	/**
+	 * Créer une carte permettant d'ajouter des joueurs
+	 *
+	 */
+	function creerCarteAjouterJoueur() {
+		const listeCartes = document.querySelector('#game-content #liste-cartes');
+		const nouveauJoueur = document.createElement('div');
+		nouveauJoueur.innerText = '+';
+		nouveauJoueur.id = 'carte-ajout-joueur';
+		nouveauJoueur.classList.add('carte-joueur');
+		nouveauJoueur.addEventListener('click', ajouterJoueur);
+		listeCartes.append(nouveauJoueur);
+	}
+
 	function afficherListeJoueurs(id, hote, invitations) {
 		const listeCartes = document.querySelector('#game-content #liste-cartes');
 		listeCartes.innerHTML = '';
@@ -625,11 +651,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			hote === utilisateurActuel &&
 			partiesStupideVautour[partieActuelle].size + invitations.length < 5
 		) {
-			const nouveauJoueur = document.createElement('div');
-			nouveauJoueur.innerText = '+';
-			nouveauJoueur.classList.add('carte-joueur');
-			nouveauJoueur.addEventListener('click', ajouterJoueur);
-			listeCartes.append(nouveauJoueur);
+			creerCarteAjouterJoueur();
 		}
 	}
 
