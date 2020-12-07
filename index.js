@@ -60,10 +60,10 @@ function envoyerListeVautour(id, player, estParti = false) {
 	if (players === false) {
 		return;
 	}
-	for (let j of players) {
+	for (let j in players) {
 		// envoie la nouvelle liste aux joueurs de la parties
-		if (clients[j] !== undefined) {
-			clients[j].emit('vautour-liste', {
+		if (clients[players[j]] !== undefined) {
+			clients[players[j]].emit('vautour-liste', {
 				id: id,
 				liste: partieVautour.getPlayersList(id),
 				hote: partieVautour.getHost(id),
@@ -292,6 +292,21 @@ io.on('connection', function (socket) {
 		envoyerListeVautour(data.id, data.from, true);
 		// log
 		console.log(`Le joueur ${data.from} a quitté la partie (#${data.id})`);
+	});
+
+	socket.on('infos-partie', data => {
+		if (clients[data.from] != undefined) {
+			clients[data.from].emit('infos-partie', {
+				id: data.id,
+				isLaunched: partieVautour.isLaunched(data.id),
+				hote: partieVautour.getHost(data.id),
+				players: partieVautour.getPlayerGames(data.id),
+				invitations: partieVautour.getInvite(data.id),
+				hand: partieVautour.getHand(data.id, data.from),
+				pile: partieVautour.getTopPile(data.id),
+				turn: partieVautour.getNumTurn(data.id),
+			});
+		}
 	});
 
 	/* --------------------------------------------------------- */

@@ -66,7 +66,7 @@ function getInvite(id) {
 
 function getPlayersList(id) {
 	if (!games[id]) {
-		return false;
+		return null;
 	}
 	return Object.keys(games[id].playersList);
 }
@@ -74,6 +74,16 @@ function getPlayersList(id) {
 function getHost(id) {
 	if (!games[id]) return null;
 	return games[id].host;
+}
+
+function getHand(id, player) {
+	if (!games[id] || !games[id].playersList[player]) return null;
+	return games[id].playersList[player].hand;
+}
+
+function isLaunched(id) {
+	if (!games[id]) return null;
+	return games[id].isLaunched;
 }
 
 /**
@@ -157,23 +167,17 @@ function removePlayer(id, p) {
 /****************  Functions for the game itself  *******************/
 
 function getTopPile(id) {
-	if (id == null) {
-		return false;
-	}
+	if (!games[id]) return null;
 	return games[id].pile.length == 0 ? null : games[id].pile.pop();
 }
 
 function getNumTurn(id) {
-	if (id == null) {
-		return false;
-	}
+	if (!games[id]) return null;
 	return games[id].numTurn;
 }
 
 function addCard(val, id) {
-	if (id == null) {
-		return false;
-	}
+	if (!games[id]) return null;
 	if (val != null) {
 		games[id].chosenCards.push(val);
 	}
@@ -225,9 +229,8 @@ function shuffleCards(id) {
  * @param id The id of the game
  */
 function initGame(id) {
-	if (id == null) {
-		return false;
-	}
+	if (!games[id]) return null;
+
 	for (let name of games[id].playersList) {
 		addPlayer(id, name);
 	}
@@ -249,6 +252,8 @@ module.exports = {
 	getPlayerGames,
 	getHost,
 	getInvite,
+	getHand,
+	isLaunched,
 	initGame,
 	removeInvite,
 	getScores,

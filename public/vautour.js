@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const UIGame = {
 		radio: document.getElementById('radio3'),
 		content: document.getElementById('game'),
+		navbar: document.getElementById('nav'),
 		game: document.getElementById('game-content'),
 		chat: {
 			messages: document.querySelector('#game aside #messages'),
@@ -155,6 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 						const listeHTML = document.createElement('div');
 						listeHTML.setAttribute('id', 'liste-cartes');
 						UIGame.game.append(listeHTML);
+						creerOngletPartie(data.from);
 					} else if (e.target.innerText === 'Refuser') {
 						toSend.answer = false;
 					}
@@ -218,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	sock.on('vautour-liste', data => {
-		console.log('recu liste joueur');
 		partiesStupideVautour[data.id] = new Set(data.liste);
 
 		// Mettre à jour la liste affichée
@@ -286,9 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		UIGame.chat.messages.innerHTML = '';
 		UIChat.messages.innerHTML = '';
 		for (let partie in partiesStupideVautour) {
-			if (partiesStupideVautour[partie].has(utilisateurActuel)) {
-				partiesStupideVautour[partie].delete(utilisateurActuel);
-			}
+			delete partiesStupideVautour[partie];
 		}
 		utilisateurActuel = null;
 	}
@@ -523,12 +522,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		// enregistrement de la nouvelle partie
 		partieActuelle = id;
 		partiesStupideVautour[id] = new Set();
-
+		partiesStupideVautour[id].add(utilisateurActuel);
 		// afficher la zone de jeu
 		UIGame.radio.checked = true;
 		UIGame.game.innerHTML = '';
 
 		// -> afficher l'interface de création de partie
+		// Ajout d'un onglet à la navbar
+		creerOngletPartie(utilisateurActuel);
 
 		// liste de cartes
 		const listeCartes = document.createElement('div');
@@ -636,15 +637,27 @@ document.addEventListener('DOMContentLoaded', () => {
 		listeCartes.append(nouveauJoueur);
 	}
 
+	/**
+	 * Affiche la liste des joueurs présents dans la partie sous forme de cartes ainsi qu'une carte pour ajouter des joueurs
+	 *
+	 * @param {string} id	L'identifiant de la partie
+	 * @param {string} hote	L'hôte de la partie
+	 * @param {object} invitations Les invitations en attente de la partie
+	 */
 	function afficherListeJoueurs(id, hote, invitations) {
 		const listeCartes = document.querySelector('#game-content #liste-cartes');
 		listeCartes.innerHTML = '';
 		const autresJoueur = document.createElement('div');
 		autresJoueur.id = 'cartes-autres';
+		// Créer les cartes des joueurs
 		for (let joueur of partiesStupideVautour[id]) {
 			if (joueur === hote && !document.getElementById('carte-hote')) {
 				listeCartes.append(creerCarteJoueur(joueur, true));
-			} else if (joueur !== hote && !document.getElementById(joueur)) {
+			} else if (
+				joueur !== hote &&
+				!document.getElementById(joueur) &&
+				!invitations.includes(joueur)
+			) {
 				autresJoueur.append(creerCarteJoueur(joueur, false));
 			}
 		}
@@ -665,6 +678,47 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
+	/**
+	 * Créer un onglet dans la barre de navigation pour basculer d'une partie à une autre
+	 *
+	 * @param {string} hote L'hote de la partie
+	 */
+	function creerOngletPartie(hote) {
+		if (UIGame.navbar == undefined) {
+			return;
+		}
+		for (const elem of document.getElementsByClassName('currentGame')) {
+			elem.classList.remove('currentGame');
+		}
+		const onglet = document.createElement('span');
+		onglet.id = partieActuelle;
+		onglet.innerText = `Partie de ${hote}`;
+		onglet.classList.add('currentGame');
+		onglet.addEventListener('click', e => {
+			for (const elem of document.getElementsByClassName('currentGame')) {
+				elem.classList.remove('currentGame');
+			}
+			e.target.classList.add('currentGame');
+			partieActuelle = e.target.id;
+			afficherParties();
+		});
+		UIGame.navbar.insertAdjacentElement('beforeend', onglet);
+	}
+
+	function afficherParties() {
+		sock.emit('infos-partie', { id: partieActuelle, from: utilisateurActuel });
+		sock.on('infos-partie', data => {
+			if (!data.isLaunched) {
+				if (UIGame.game.listeCartes) {
+					UIGame.game.listesCartes.innerHTML = '';
+				}
+				afficherListeJoueurs(data.id, data.hote, data.invitations);
+			} else {
+				// Afficher la partie
+			}
+		});
+	}
+
 	/* -------------------- Ecouteurs -------------------- */
 
 	// --> click
@@ -681,11 +735,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		envoyer(UIGame.chat.input)
 	);
 	UIGame.btnAnnuler.addEventListener('click', () => {
-		sock.emit('vautour-annuler', {
-			id: partieActuelle,
-			from: utilisateurActuel,
-		});
-		UIChat.radio.checked = true;
+		if (confirm('Quittez la partie')) {
+			sock.emit('vautour-annuler', {
+				id: partieActuelle,
+				from: utilisateurActuel,
+			});
+			UIChat.radio.checked = true;
+			delete partiesStupideVautour[partieActuelle];
+			// afficherParties();
+		}
 	});
 	// Synthèse vocale
 	UIVoix.activer.addEventListener('click', () => {
