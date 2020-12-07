@@ -65,9 +65,7 @@ function getInvite(id) {
 }
 
 function getPlayersList(id) {
-	if (!games[id]) {
-		return null;
-	}
+	if (!games[id]) return null;
 	return Object.keys(games[id].playersList);
 }
 
@@ -97,6 +95,7 @@ function addPlayer(id, name, isAI = false) {
 	if (!games[id] || (!isAI && !isInvited(id, name))) return false;
 
 	games[id].playersList[name] = new Player(name, isAI);
+	if (!isAI) removeInvite(id, name);
 	return true;
 }
 
@@ -120,16 +119,15 @@ function getPlayerGames(player) {
  * @param {String} p The player to replace by an AI
  */
 function removePlayer(id, p) {
-	if (id == null) {
-		return -1;
-	}
-	let players = games[id].playersList;
+	if (!games[id]) return -1;
+
+	const players = games[id].playersList;
 	if (!players[p]) {
-		if (!games[id].invitations.includes(p)) {
-			return -2;
-		}
+		if (!games[id].invitations.includes(p)) return -2;
 		games[id].invitations.splice(games[id].invitations.indexOf(p), 1);
+		return -2;
 	}
+
 	if (!games[id].isLaunched) {
 		// If the game hasn't started yet, delete the player and make another player host if the player to delete was the host
 		delete players[p];
@@ -145,7 +143,7 @@ function removePlayer(id, p) {
 			if (!gotNewHost) {
 				// No host could be selected, stop the game
 				delete games[id];
-				return;
+				return 1;
 			}
 		}
 	} else {
@@ -157,11 +155,11 @@ function removePlayer(id, p) {
 	// If all the players are AI, end the game
 	for (let p in players) {
 		if (!players[p].isAI) {
-			return true;
+			return 0;
 		}
 	}
 	endGame(games[id]);
-	return false;
+	return 1;
 }
 
 /****************  Functions for the game itself  *******************/
@@ -172,15 +170,14 @@ function getTopPile(id) {
 }
 
 function getNumTurn(id) {
-	if (!games[id]) return null;
+	if (!games[id]) return -1;
 	return games[id].numTurn;
 }
 
 function addCard(val, id) {
-	if (!games[id]) return null;
-	if (val != null) {
-		games[id].chosenCards.push(val);
-	}
+	if (!games[id]) return false;
+	games[id].chosenCards.push(val);
+	return true;
 }
 
 /**
@@ -194,16 +191,11 @@ function playTurn() {}
  * @param id The id of the game
  */
 function getScores(id) {
-	if (id == null || games[id] == undefined) {
-		return false;
-	}
+	if (!games[id]) return null;
+
 	let scores = {};
-	for (let user of games[id].playersList) {
-		if (games[id].playersList[user] === undefined) {
-			scores[user] = 0;
-		} else {
-			scores[user] = games[id].playersList[user].getScore();
-		}
+	for (let user in games[id].playersList) {
+		scores[user] = games[id].playersList[user].score;
 	}
 	return JSON.stringify(scores);
 }
@@ -214,9 +206,7 @@ function getScores(id) {
  * @param id The id of the game
  */
 function shuffleCards(id) {
-	if (id == null) {
-		return false;
-	}
+	if (!games[id]) return;
 	games[id].pile = games[id].pile
 		.map(n => ({ sort: Math.random(), value: n }))
 		.sort((a, b) => a.sort - b.sort)
@@ -229,13 +219,11 @@ function shuffleCards(id) {
  * @param id The id of the game
  */
 function initGame(id) {
-	if (!games[id]) return null;
+	if (!games[id]) return false;
 
-	for (let name of games[id].playersList) {
-		addPlayer(id, name);
-	}
 	games[id].isLaunched = true;
-	shuffleCards();
+	shuffleCards(id);
+	return true;
 }
 
 function endGame(game) {
