@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			input: document.querySelector('#game aside #send-messages #message'),
 			btnSend: document.querySelector('#game aside #send-messages #envoyer'),
 		},
+		btnAnnuler: document.getElementById('annulerBtn'),
 	};
 	const UIVoix = {
 		activer: document.getElementById('syntheseBtn'),
@@ -171,6 +172,27 @@ document.addEventListener('DOMContentLoaded', () => {
 					document
 						.querySelector(`#cartes-autres #${data.from}`)
 						.classList.remove('carte-attente');
+					if (partiesStupideVautour[partieActuelle].size >= 2) {
+						// bouton pour lancer la partie
+						const jouerBouton = document.createElement('btn');
+						jouerBouton.innerText = 'Lancer la partie';
+						jouerBouton.setAttribute('id', 'jouerBtn');
+						UIGame.game.append(jouerBouton);
+						UIGame.game.insertAdjacentHTML(
+							'afterbegin',
+							'<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs><symbol id="arrow" viewBox="0 0 100 100"><path d="M12.5 45.83h64.58v8.33H12.5z"/><path d="M59.17 77.92l-5.84-5.84L75.43 50l-22.1-22.08 5.84-5.84L87.07 50z"/></symbol></defs></svg>'
+						);
+
+						UIGame.game.insertAdjacentHTML(
+							'beforeend',
+							'<label for="jouerBtn" class="button" id="labelJouerBtn"><span><svg><use xlink:href="#arrow" href="#arrow"></use></svg></span></label >'
+						);
+						document
+							.getElementById('labelJouerBtn')
+							.addEventListener('click', () => {
+								sock.emit('jouer-vautour', data.id);
+							});
+					}
 				} else {
 					partiesStupideVautour[partieActuelle].delete(data.from);
 					document
@@ -192,7 +214,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		popup.addEventListener('click', () => {
 			document.body.removeChild(document.getElementById('popup'));
 		});
-		UIGame.radio.checked = false;
 		UIChat.radio.checked = true;
 	});
 
@@ -204,6 +225,21 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (document.querySelector('#game-content #liste-cartes')) {
 			afficherListeJoueurs(data.id, data.hote, data.invitations);
 		}
+
+		// Afficher si un joueur a quitté ou rejoint la partie
+		let msg = {
+			from: null,
+			text: data.msg,
+			date: Date.now(),
+		};
+		afficherMessage(msg);
+	});
+
+	sock.on('debut-partie', () => {
+		UIGame.game.innerHTML = '';
+		/*
+		 * TODO : FAIRE L'UI de la partie en cours
+		 */
 	});
 
 	/**
@@ -494,32 +530,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		// -> afficher l'interface de création de partie
 
-		// bouton pour lancer la partie
-		const jouerBouton = document.createElement('btn');
-		jouerBouton.innerText = 'Lancer la partie';
-		jouerBouton.setAttribute('id', 'jouerBtn');
-		UIGame.game.append(jouerBouton);
-		UIGame.game.insertAdjacentHTML(
-			'afterbegin',
-			'<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs><symbol id="arrow" viewBox="0 0 100 100"><path d="M12.5 45.83h64.58v8.33H12.5z"/><path d="M59.17 77.92l-5.84-5.84L75.43 50l-22.1-22.08 5.84-5.84L87.07 50z"/></symbol></defs></svg>'
-		);
-		UIGame.game.insertAdjacentHTML(
-			'beforeend',
-			'<label for="jouerBtn" class="button"><span><svg><use xlink:href="#arrow" href="#arrow"></use></svg></span></label >'
-		);
-
-		// bouton pour annuler la partie
-		const annulerBouton = document.createElement('btn');
-		annulerBouton.innerText = 'Retour';
-		annulerBouton.setAttribute('id', 'annulerBtn');
-		annulerBouton.addEventListener('click', () => {
-			sock.emit('vautour-annuler', {
-				id: partieActuelle,
-				from: utilisateurActuel,
-			});
-		});
-		UIGame.game.append(annulerBouton);
-
 		// liste de cartes
 		const listeCartes = document.createElement('div');
 		listeCartes.setAttribute('id', 'liste-cartes');
@@ -660,14 +670,24 @@ document.addEventListener('DOMContentLoaded', () => {
 	// --> click
 
 	UIConnexion.btn.addEventListener('click', connecter);
+	// Chat
 	UIChat.btnLeft.addEventListener('click', quitter);
 	UIChat.btnSend.addEventListener('click', () => envoyer(UIChat.input));
-	UIGame.chat.btnSend.addEventListener('click', () =>
-		envoyer(UIGame.chat.input)
-	);
 	UIChat.users.addEventListener('click', e => {
 		UIChat.input.value += `@${e.target.innerText}`;
 	});
+	// Game
+	UIGame.chat.btnSend.addEventListener('click', () =>
+		envoyer(UIGame.chat.input)
+	);
+	UIGame.btnAnnuler.addEventListener('click', () => {
+		sock.emit('vautour-annuler', {
+			id: partieActuelle,
+			from: utilisateurActuel,
+		});
+		UIChat.radio.checked = true;
+	});
+	// Synthèse vocale
 	UIVoix.activer.addEventListener('click', () => {
 		if (!utilisateurActuel) return;
 		UIVoix.popup.classList.add('afficherFenetre');
