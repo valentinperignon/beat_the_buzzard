@@ -373,6 +373,28 @@ input[type='radio']:checked + #game {
 	background-color: rgb(243, 103, 22);
 }
 
+/** nav **/
+#game #nav {
+	position: absolute;
+	left: 10%;
+	min-width: 60%;
+	width: 60%;
+	max-width: 60%;
+	display: flex;
+	justify-content: center;
+}
+
+#game #nav span {
+	word-wrap: break-word;
+	padding: 1em;
+	background-color: rgba(235, 143, 23, 0.863);
+	cursor: pointer;
+}
+
+#game #nav .currentGame {
+	background-color: rgb(253, 190, 17);
+}
+
 #game main {
 	flex-grow: 1;
 	padding: 1rem;
@@ -386,6 +408,7 @@ input[type='radio']:checked + #game {
 	text-transform: uppercase;
 	text-align: center;
 	min-width: 20rem;
+	margin-top: 5rem;
 }
 
 #game aside {
