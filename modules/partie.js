@@ -32,6 +32,10 @@ function createGame(host) {
 	return id;
 }
 
+function removeGame(id) {
+	delete games[id];
+}
+
 function addInvite(id, player) {
 	if (!games[id] || games[id].invitations.includes(player)) return false;
 
@@ -238,6 +242,7 @@ function endGame(game) {
 
 module.exports = {
 	createGame,
+	removeGame,
 	addInvite,
 	isInvited,
 	getNbInvite,

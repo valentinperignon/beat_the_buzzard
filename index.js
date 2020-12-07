@@ -1,5 +1,6 @@
 // Chargement des modules
 var express = require('express');
+const partieVautour = require('./modules/partie');
 var app = express();
 var server = app.listen(8080, function () {
 	console.log("C'est parti ! En attente de connexion sur le port 8080...");
@@ -27,9 +28,6 @@ var clients = {}; // { id -> socket, ... }
 /***************************************************************
  *           Gestion des parties de stupides vautours
  ***************************************************************/
-
-// Module contenant les parties de stupides vautours
-var partieVautour = require('./modules/partie');
 var scores = {};
 
 /**
@@ -46,7 +44,7 @@ function supprimer(name, tabID) {
 			console.log('Suppression du joueur ' + name + 'de la partie' + id);
 			let err = partieVautour.removePlayer(id, name);
 			console.log('Statut de la suppression : ' + err);
-			envoyerListeVautour(id);
+			envoyerListeVautour(id, name, true);
 		}
 	}
 }
@@ -55,8 +53,9 @@ function supprimer(name, tabID) {
  * Envoie la liste des joueurs d'une partie de Stupide vautour aux joueurs concernés
  *
  * @param id Identifiant de la partie
+ * @param player
  */
-function envoyerListeVautour(id) {
+function envoyerListeVautour(id, player, estParti = false) {
 	let players = partieVautour.getPlayersList(id);
 	if (players === false) {
 		return;
@@ -69,6 +68,9 @@ function envoyerListeVautour(id) {
 				liste: partieVautour.getPlayersList(id),
 				hote: partieVautour.getHost(id),
 				invitations: partieVautour.getInvite(id),
+				msg: estParti
+					? `${player} a quitté la partie`
+					: `${player} a rejoint la partie`,
 			});
 		}
 	}
@@ -158,70 +160,77 @@ io.on('connection', function (socket) {
 
 	/* -------------------- Stupide Vautour -------------------- */
 
-	// /**
-	//  *  Joue une partie de "stupides Vautours"
-	//  */
-	// socket.on('jouerVautour', function (gameName) {
-	// 	let currGame = partieVautour.[gameName];
-	// 	if (currGame !== undefined) {
-	// 		let curr_card = currGame.getTopPile();
-	// 		while (curr_card) {
-	// 			for (const player of currGame.getPlayersList()) {
-	// 				if (!player.isAI() && clients[player] === undefined) {
-	// 					socket.emit('message', {
-	// 						from: null,
-	// 						to: currentID,
-	// 						text: 'Joueur ' + player + " absent de l'application",
-	// 						date: Date.now(),
-	// 					});
-	// 					return;
-	// 				}
-	// 				if (!player.isAI()) {
-	// 					clients[player].emit('message', {
-	// 						from: null,
-	// 						to: null,
-	// 						text: 'Début du tour n° ' + currGame.getNumTurn(),
-	// 						date: Date.now(),
-	// 					});
-	// 					// Send the card on top of the pile to the players
-	// 					clients[player].emit('pile', curr_card);
-	// 					// Reception of the players' choices
-	// 					socket.on('choixCarte', data => {
-	// 						if (data != null) {
-	// 							if (currGame.getPlayersList()[data.from] === undefined) {
-	// 								socket.emit('message', {
-	// 									from: null,
-	// 									to: null,
-	// 									text:
-	// 										"L'utilisateur " +
-	// 										data.from +
-	// 										" n'est pas un joueur de cette partie",
-	// 									date: Date.now(),
-	// 								});
-	// 								return false;
-	// 							}
-	// 							currGame.addCard(player.chooseCard(data.card));
-	// 						}
-	// 					});
-	// 				} else {
-	// 					// AI
-	// 					currGame.addCard(player.chooseCard());
-	// 				}
-	// 			}
-	// 			currGame.playTurn(); // To-do
-	// 			curr_card = currGame.getTopPile();
-	// 		}
-	// 		//let winner = currGame.endGame();
-	// 		// TO-DO : End the game and return to menu
-	// 	} else {
-	// 		socket.emit('message', {
-	// 			from: null,
-	// 			to: currentID,
-	// 			text: 'Aucune partie de ce nom en cours',
-	// 			date: Date.now(),
-	// 		});
-	// 	}
-	// });
+	/**
+	 *  Joue une partie de "stupides Vautours"
+	 */
+	socket.on('jouer-vautour', id => {
+		// Envoi un message aux joueurs de la partie
+		let players = partieVautour.getPlayersList(id);
+		for (const p of players) {
+			if (clients[p] != undefined) {
+				clients[p].emit('debut-partie');
+			}
+		}
+		// let currGame = partieVautour.[id];
+		// if (currGame !== undefined) {
+		// 	let curr_card = currGame.getTopPile();
+		// 	while (curr_card) {
+		// 		for (const player of currGame.getPlayersList()) {
+		// 			if (!player.isAI() && clients[player] === undefined) {
+		// 				socket.emit('message', {
+		// 					from: null,
+		// 					to: currentID,
+		// 					text: 'Joueur ' + player + " absent de l'application",
+		// 					date: Date.now(),
+		// 				});
+		// 				return;
+		// 			}
+		// 			if (!player.isAI()) {
+		// 				clients[player].emit('message', {
+		// 					from: null,
+		// 					to: null,
+		// 					text: 'Début du tour n° ' + currGame.getNumTurn(),
+		// 					date: Date.now(),
+		// 				});
+		// 				// Send the card on top of the pile to the players
+		// 				clients[player].emit('pile', curr_card);
+		// 				// Reception of the players' choices
+		// 				socket.on('choixCarte', data => {
+		// 					if (data != null) {
+		// 						if (currGame.getPlayersList()[data.from] === undefined) {
+		// 							socket.emit('message', {
+		// 								from: null,
+		// 								to: null,
+		// 								text:
+		// 									"L'utilisateur " +
+		// 									data.from +
+		// 									" n'est pas un joueur de cette partie",
+		// 								date: Date.now(),
+		// 							});
+		// 							return false;
+		// 						}
+		// 						currGame.addCard(player.chooseCard(data.card));
+		// 					}
+		// 				});
+		// 			} else {
+		// 				// AI
+		// 				currGame.addCard(player.chooseCard());
+		// 			}
+		// 		}
+		// 		currGame.playTurn(); // To-do
+		// 		curr_card = currGame.getTopPile();
+		// 	}
+		// 	//let winner = currGame.endGame();
+		// 	// TO-DO : End the game and return to menu
+		// } else {
+		// 	socket.emit('message', {
+		// 		from: null,
+		// 		to: currentID,
+		// 		text: 'Aucune partie de ce nom en cours',
+		// 		date: Date.now(),
+		// 	});
+		// }
+	});
 
 	/**
 	 * Création d'une partie de Stupide Vautour
@@ -255,10 +264,8 @@ io.on('connection', function (socket) {
 					partieVautour.removeInvite(data.id, data.from);
 					// envoi d'une popup avertissant le joueur invité
 					clients[data.from].emit('partie-annule');
-					console.log('aaa');
 					return;
 				}
-				console.log('bb');
 				if (data.answer) {
 					let err = partieVautour.addPlayer(data.id, data.from);
 					console.log('Ajout du joueur : ' + data.from + ' retour : ' + err);
@@ -268,7 +275,7 @@ io.on('connection', function (socket) {
 					}
 				}
 				partieVautour.removeInvite(data.id, data.from);
-				envoyerListeVautour(data.id);
+				envoyerListeVautour(data.id, data.from);
 			} else {
 				partieVautour.addInvite(data.id, data.to); // stocke l'invitation
 			}
@@ -281,12 +288,10 @@ io.on('connection', function (socket) {
 	 * Retour au chat du joueur / annulation de la partie
 	 */
 	socket.on('vautour-annuler', data => {
-		// if (/* data.from === hôte de la partie */) {
+		partieVautour.removePlayer(data.id, data.from);
+		envoyerListeVautour(data.id, data.from, true);
 		// log
-		console.log(
-			`Annulation de la partie (${data.type}) de ${data.from} (#${data.id})`
-		);
-		// }
+		console.log(`Le joueur ${data.from} a quitté la partie (#${data.id})`);
 	});
 
 	/* --------------------------------------------------------- */
