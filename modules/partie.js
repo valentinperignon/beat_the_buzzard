@@ -80,7 +80,7 @@ function getHand(id, player) {
 }
 
 function isLaunched(id) {
-	if (!games[id]) return null;
+	if (!games[id]) return false;
 	return games[id].isLaunched;
 }
 
