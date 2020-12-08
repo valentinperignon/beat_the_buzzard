@@ -165,6 +165,7 @@ io.on('connection', function (socket) {
 	 */
 	socket.on('jouer-vautour', id => {
 		// Envoi un message aux joueurs de la partie
+		partieVautour.initGame(id);
 		let players = partieVautour.getPlayersList(id);
 		for (const p of players) {
 			if (clients[p] != undefined) {
@@ -305,6 +306,7 @@ io.on('connection', function (socket) {
 				hand: partieVautour.getHand(data.id, data.from),
 				pile: partieVautour.getTopPile(data.id),
 				turn: partieVautour.getNumTurn(data.id),
+				scores: partieVautour.getScores(data.id),
 			});
 		}
 	});

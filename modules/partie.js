@@ -214,7 +214,7 @@ function shuffleCards(id) {
 }
 
 /**
- * Initialize a game but adding the player to the list and shuffling the card's pile
+ * Initialize a game by turning its boolean isLaunched to true and shuffling the card's pile
  *
  * @param id The id of the game
  */
