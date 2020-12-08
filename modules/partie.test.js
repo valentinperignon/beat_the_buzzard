@@ -180,9 +180,41 @@ describe('Player management', function () {
 		assert.strictEqual(partie.removePlayer(id, player), 0);
 	});
 
+	it('should remove a player - game launched', function () {
+		const host = 'jbernard';
+		const id = partie.createGame(host);
+
+		const players = ['fdadeau', 'vfelea'];
+		for (let player of players) {
+			assert.strictEqual(partie.addInvite(id, player), true);
+			assert.strictEqual(partie.addPlayer(id, player), true);
+		}
+
+		assert.strictEqual(partie.initGame(id), true);
+
+		for (let player of players) {
+			assert.strictEqual(partie.removePlayer(id, player), 0);
+		}
+		assert.strictEqual(partie.removePlayer(id, host), 1);
+	});
+
 	it("should return all the player's game - general", function () {
 		const games = partie.getPlayerGames('fabian');
 		assert.strictEqual(games.length > 0, true);
+	});
+
+	it('should remove host and get a new one', function () {
+		const host = 'baptist';
+		const id = partie.createGame(host);
+
+		const players = ['fdadeau', 'vfelea'];
+		for (let player of players) {
+			assert.strictEqual(partie.addInvite(id, player), true);
+			assert.strictEqual(partie.addPlayer(id, player), true);
+		}
+
+		assert.strictEqual(partie.removePlayer(id, host), 0);
+		assert.notStrictEqual(partie.getHost(id), host);
 	});
 
 	it("should return all the player's games - as host", function () {
@@ -196,7 +228,18 @@ describe('Player management', function () {
 		const games = partie.getPlayerGames(player);
 		assert.strictEqual(games.length, gamesNumber);
 	});
+
+	it('should remove a game', function () {
+		const host = 'abraracourcix';
+		const id = partie.createGame(host);
+
+		assert.strictEqual(partie.getHost(id), host);
+		partie.removeGame(id);
+		assert.strictEqual(partie.getHost(id), null);
+	});
 });
+
+/*-------------------- Game management -------------------- */
 
 describe('Game management', function () {
 	it('should return the top stack card', function () {
@@ -276,5 +319,28 @@ describe('Game management', function () {
 		}
 
 		assert.strictEqual(isLower, false);
+	});
+
+	it('should launch the game', function () {
+		assert.strictEqual(partie.isLaunched(wrongId), false);
+
+		const id = partie.createGame('ricola');
+		assert.strictEqual(partie.initGame(id), true);
+		assert.strictEqual(partie.isLaunched(id), true);
+	});
+
+	it('should end the game LOL', function () {
+		const id = partie.createGame('nath');
+		partie.endGame(id);
+	});
+
+	it("should return a player's hand", function () {
+		assert.strictEqual(partie.getHand(wrongId, 'baptiste'), null);
+
+		const player = 'ludoChrono';
+		const id = partie.createGame(player);
+
+		assert.notStrictEqual(partie.getHand(id, player), null);
+		assert.strictEqual(partie.getHand(id, `${player}s`), null);
 	});
 });
