@@ -1,9 +1,10 @@
 // Chargement des modules
 var express = require('express');
+const partie = require('./modules/partie');
 const partieVautour = require('./modules/partie');
 var app = express();
 var server = app.listen(8080, function () {
-	console.log("C'est parti ! En attente de connexion sur le port 8080...");
+	console.log('[Général] En attente de connexion sur le port 8080...');
 });
 
 // Ecoute sur les websockets
@@ -41,9 +42,10 @@ function supprimer(name, tabID) {
 	if (tabID != undefined && tabID instanceof Array && tabID.length != 0) {
 		for (let id of tabID) {
 			// Supprime le joueur dans toutes les parties auquelles il jouait
-			console.log('Suppression du joueur ' + name + 'de la partie' + id);
-			let err = partieVautour.removePlayer(id, name);
-			console.log('Statut de la suppression : ' + err);
+			console.log(
+				'[Stupide Vautour] Suppression du joueur ' + name + 'de la partie' + id
+			);
+			partieVautour.removePlayer(id, name);
 			envoyerListeVautour(id, name, true);
 		}
 	}
@@ -76,10 +78,13 @@ function envoyerListeVautour(id, player, estParti = false) {
 	}
 }
 
+/***************************************************************
+ *                 Gestion des sockets
+ ***************************************************************/
+
 // Quand un client se connecte, on le note dans la console
 io.on('connection', function (socket) {
-	// message de debug
-	console.log("Un client s'est connecté");
+	console.log("[Général] Un client s'est connecté");
 	var currentID = null;
 
 	/**
@@ -97,7 +102,7 @@ io.on('connection', function (socket) {
 		// initialisation
 		clients[currentID] = socket;
 		// log
-		console.log('Nouvel utilisateur : ' + currentID);
+		console.log('[Général] Nouvel utilisateur : ' + currentID);
 		// scores
 		scores[currentID] = 0;
 		// envoi d'un message de bienvenue à ce client
@@ -118,11 +123,10 @@ io.on('connection', function (socket) {
 	 *  @param  msg     Object  le message à transférer à tous
 	 */
 	socket.on('message', function (msg) {
-		console.log('Reçu message');
+		console.log('[Général] Nouveau message');
 		// si message privé, envoi seulement au destinataire
 		if (msg.to != null) {
 			if (clients[msg.to] !== undefined) {
-				console.log(' --> message privé');
 				clients[msg.to].emit('message', {
 					from: currentID,
 					to: msg.to,
@@ -148,7 +152,6 @@ io.on('connection', function (socket) {
 		}
 		// sinon, envoi à tous les gens connectés
 		else {
-			console.log(' --> broadcast');
 			io.sockets.emit('message', {
 				from: currentID,
 				to: null,
@@ -163,74 +166,21 @@ io.on('connection', function (socket) {
 	/**
 	 *  Joue une partie de "stupides Vautours"
 	 */
-	socket.on('jouer-vautour', id => {
-		// Envoi un message aux joueurs de la partie
+	socket.on('vautour-init', id => {
 		partieVautour.initGame(id);
-		let players = partieVautour.getPlayersList(id);
+
+		const players = partieVautour.getPlayersList(id);
+		const pile = partieVautour.getTopPile(id);
 		for (const p of players) {
-			if (clients[p] != undefined) {
-				clients[p].emit('debut-partie');
-			}
+			clients[p].emit('vautour-init', {
+				id: id,
+				hote: partieVautour.getHost(id),
+				hand: partieVautour.getHand(id, p),
+				pile: pile,
+				turn: partieVautour.getNumTurn(id),
+				scores: partieVautour.getScores(id),
+			});
 		}
-		// let currGame = partieVautour.[id];
-		// if (currGame !== undefined) {
-		// 	let curr_card = currGame.getTopPile();
-		// 	while (curr_card) {
-		// 		for (const player of currGame.getPlayersList()) {
-		// 			if (!player.isAI() && clients[player] === undefined) {
-		// 				socket.emit('message', {
-		// 					from: null,
-		// 					to: currentID,
-		// 					text: 'Joueur ' + player + " absent de l'application",
-		// 					date: Date.now(),
-		// 				});
-		// 				return;
-		// 			}
-		// 			if (!player.isAI()) {
-		// 				clients[player].emit('message', {
-		// 					from: null,
-		// 					to: null,
-		// 					text: 'Début du tour n° ' + currGame.getNumTurn(),
-		// 					date: Date.now(),
-		// 				});
-		// 				// Send the card on top of the pile to the players
-		// 				clients[player].emit('pile', curr_card);
-		// 				// Reception of the players' choices
-		// 				socket.on('choixCarte', data => {
-		// 					if (data != null) {
-		// 						if (currGame.getPlayersList()[data.from] === undefined) {
-		// 							socket.emit('message', {
-		// 								from: null,
-		// 								to: null,
-		// 								text:
-		// 									"L'utilisateur " +
-		// 									data.from +
-		// 									" n'est pas un joueur de cette partie",
-		// 								date: Date.now(),
-		// 							});
-		// 							return false;
-		// 						}
-		// 						currGame.addCard(player.chooseCard(data.card));
-		// 					}
-		// 				});
-		// 			} else {
-		// 				// AI
-		// 				currGame.addCard(player.chooseCard());
-		// 			}
-		// 		}
-		// 		currGame.playTurn(); // To-do
-		// 		curr_card = currGame.getTopPile();
-		// 	}
-		// 	//let winner = currGame.endGame();
-		// 	// TO-DO : End the game and return to menu
-		// } else {
-		// 	socket.emit('message', {
-		// 		from: null,
-		// 		to: currentID,
-		// 		text: 'Aucune partie de ce nom en cours',
-		// 		date: Date.now(),
-		// 	});
-		// }
 	});
 
 	/**
@@ -240,7 +190,7 @@ io.on('connection', function (socket) {
 		let numPartie = partieVautour.createGame(from);
 		// log
 		console.log(
-			`Création d'une partie de Stupide Vautour par ${from} (numéro ${numPartie})`
+			`[Stupide Vautour] Création d'une partie par ${from} (numéro ${numPartie})`
 		);
 		// retourner le numéro de la partie
 		socket.emit('vautour-creer', numPartie);
@@ -252,14 +202,13 @@ io.on('connection', function (socket) {
 	socket.on('vautour-invitation', data => {
 		// log
 		console.log(
-			`Invitation à "Stupide Vautour" (${data.type}) : ${data.from} -> ${data.to} (#${data.id})`
+			`[Stupide Vautour] Invitation (${data.type}) : ${data.from} -> ${data.to} (#${data.id})`
 		);
 		// transmettre l'invitation
 		if (!partieVautour.isInvited(data.id, data.to)) {
 			// traitement si invitation acceptée
 			if (data.type === 'answer') {
 				data.to = partieVautour.getHost(data.id);
-				console.log(data.to);
 				// S'il n'y a plus d'hote on annule toute les invitations
 				if (data.to == undefined) {
 					partieVautour.removeInvite(data.id, data.from);
@@ -268,12 +217,7 @@ io.on('connection', function (socket) {
 					return;
 				}
 				if (data.answer) {
-					let err = partieVautour.addPlayer(data.id, data.from);
-					console.log('Ajout du joueur : ' + data.from + ' retour : ' + err);
-					console.log('Joueurs de la partie ' + data.id + ' :');
-					for (let j of partieVautour.getPlayersList(data.id)) {
-						console.log(' ' + j + ' ');
-					}
+					partieVautour.addPlayer(data.id, data.from);
 				}
 				partieVautour.removeInvite(data.id, data.from);
 				envoyerListeVautour(data.id, data.from);
@@ -282,7 +226,51 @@ io.on('connection', function (socket) {
 			}
 			clients[data.to].emit('vautour-invitation', data);
 		}
-		console.log('nb invitation : ' + partieVautour.getNbInvite(data.id) + '\n');
+	});
+
+	/**
+	 * Un joueur propose une carte
+	 */
+	socket.on('vautour-choix-carte', data => {
+		if (!partie.addCard(data.id, data.from, data.value)) {
+			socket.emit(
+				'vautour-erreur',
+				'Vous ne pouvez pas jouer une nouvelle fois.'
+			);
+			return;
+		}
+
+		// Chaque joueur choisi une carte
+		if (
+			partie.getCardPlayedNb(data.id) === partie.getPlayersList(data.id).length
+		) {
+			const winner = partie.playTurn(data.id);
+
+			const pile = partieVautour.getTopPile(data.id);
+			const players = partie.getPlayersList(data.id);
+			for (let player of players) {
+				clients[player].emit('vautour-nouveau-tour', {
+					hote: partieVautour.getHost(data.id),
+					hand: partieVautour.getHand(data.id, player),
+					pile: pile,
+					turn: partieVautour.getNumTurn(data.id),
+					scores: partieVautour.getScores(data.id),
+					winner: winner,
+				});
+			}
+
+			if (partie.getNumTurn(data.id) === partie.FINAL_TURN + 1) {
+				const gameWinner = partie.endGame(data.id);
+				for (let player of players) {
+					clients[player].emit('vautour-fin-partie', {
+						id: data.id,
+						winner: gameWinner,
+					});
+				}
+
+				return;
+			}
+		}
 	});
 
 	/**
@@ -292,16 +280,20 @@ io.on('connection', function (socket) {
 		partieVautour.removePlayer(data.id, data.from);
 		envoyerListeVautour(data.id, data.from, true);
 		// log
-		console.log(`Le joueur ${data.from} a quitté la partie (#${data.id})`);
+		console.log(
+			`[Stupide Vautour] ${data.from} a quitté la partie (#${data.id})`
+		);
 	});
 
-	socket.on('infos-partie', data => {
+	/**
+	 * Envoyer les informations disponible sur une partie précise
+	 */
+	socket.on('vautour-infos', data => {
 		if (clients[data.from] != undefined) {
-			clients[data.from].emit('infos-partie', {
+			clients[data.from].emit('vautour-infos', {
 				id: data.id,
 				isLaunched: partieVautour.isLaunched(data.id),
 				hote: partieVautour.getHost(data.id),
-				players: partieVautour.getPlayerGames(data.id),
 				invitations: partieVautour.getInvite(data.id),
 				hand: partieVautour.getHand(data.id, data.from),
 				pile: partieVautour.getTopPile(data.id),
@@ -314,14 +306,12 @@ io.on('connection', function (socket) {
 	/* --------------------------------------------------------- */
 
 	/**
-	 *  Gestion des déconnexions
+	 * Fermeture
 	 */
-
-	// fermeture
 	socket.on('logout', function (tabID) {
 		// si client était identifié (devrait toujours être le cas)
 		if (currentID) {
-			console.log("Sortie de l'utilisateur " + currentID);
+			console.log("[Général] Sortie de l'utilisateur " + currentID);
 			// envoi de l'information de déconnexion
 			socket.broadcast.emit('message', {
 				from: null,
@@ -338,7 +328,9 @@ io.on('connection', function (socket) {
 		}
 	});
 
-	// déconnexion de la socket
+	/**
+	 * Déconnexion de la socket
+	 */
 	socket.on('disconnect', function () {
 		// si client était identifié
 		if (currentID) {
@@ -360,6 +352,6 @@ io.on('connection', function (socket) {
 			// envoi de la nouvelle liste pour mise à jour
 			socket.broadcast.emit('liste', scores);
 		}
-		console.log('Client déconnecté');
+		console.log('[Général] Client déconnecté');
 	});
 });

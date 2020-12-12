@@ -39,13 +39,11 @@ describe('Invite players', function () {
 	it('should allow a host to send several invitations', function () {
 		const id = partie.createGame('valentin');
 
-		const [player1, player2] = ['pierre', 'fdadeau'];
-		let result = partie.addInvite(id, player1);
-		assert.strictEqual(result, true);
-		assert.strictEqual(partie.getNbInvite(id), 1);
-		result = partie.addInvite(id, player2);
-		assert.strictEqual(result, true);
-		assert.strictEqual(partie.getNbInvite(id), 2);
+		const players = ['pierre', 'fdadeau'];
+		for (let player of players) {
+			assert.strictEqual(partie.addInvite(id, player), true);
+			assert.strictEqual(partie.isInvited(id, player), true);
+		}
 	});
 
 	it('should refuse to send an invitation if the id is wrong', function () {
@@ -73,32 +71,18 @@ describe('Invite players', function () {
 		assert.strictEqual(partie.isInvited(wrongId, player), false);
 	});
 
-	it('should return the number of players invited', function () {
-		const id = partie.createGame('fabian');
-
-		assert.strictEqual(partie.getNbInvite(id), 0);
-		assert.strictEqual(partie.addInvite(id, 'fdadeau'), true);
-		assert.strictEqual(partie.getNbInvite(id), 1);
-		assert.strictEqual(partie.addInvite(id, 'jbernard'), true);
-		assert.strictEqual(partie.getNbInvite(id), 2);
-
-		assert.strictEqual(partie.getNbInvite(wrongId), 0);
-	});
-
 	it('should remove players', function () {
 		const id = partie.createGame('fabian');
 
+		const playerJSMaster = 'fdadeau';
 		const playerHacker = 'fd4d34u';
-		assert.strictEqual(partie.getNbInvite(id), 0);
-		assert.strictEqual(partie.addInvite(id, 'fdadeau'), true);
-		assert.strictEqual(partie.getNbInvite(id), 1);
+		assert.strictEqual(partie.addInvite(id, playerJSMaster), true);
+		assert.strictEqual(partie.isInvited(id, playerJSMaster), true);
 		assert.strictEqual(partie.addInvite(id, playerHacker), true);
-		assert.strictEqual(partie.getNbInvite(id), 2);
+		assert.strictEqual(partie.isInvited(id, playerHacker), true);
 
 		assert.strictEqual(partie.removeInvite(id, playerHacker), true);
-		assert.strictEqual(partie.getNbInvite(id), 1);
-		assert.strictEqual(partie.removeInvite(id, playerHacker), false);
-		assert.strictEqual(partie.getNbInvite(id), 1);
+		assert.strictEqual(partie.isInvited(id, playerHacker), false);
 	});
 
 	it('should return all invites', function () {
@@ -124,9 +108,9 @@ describe('Player management', function () {
 
 		const player = 'medhi';
 		assert.strictEqual(partie.addInvite(id, player), true);
-		assert.strictEqual(partie.getNbInvite(id), 1);
+		assert.strictEqual(partie.isInvited(id, player), true);
 		assert.strictEqual(partie.addPlayer(id, player), true);
-		assert.strictEqual(partie.getNbInvite(id), 0);
+		assert.strictEqual(partie.isInvited(id, player), false);
 	});
 
 	it('should refuse to add a player (not IA) not invited', function () {
@@ -135,7 +119,6 @@ describe('Player management', function () {
 		assert.strictEqual(partie.addPlayer(id, 'nath'), false);
 		assert.strictEqual(partie.addInvite(id, 'baptiste'), true);
 		assert.strictEqual(partie.addPlayer(id, 'fd4d434u', true), true);
-		assert.strictEqual(partie.getNbInvite(id), 1);
 	});
 
 	it('should refuse to add a player if the game doesn\t exist', function () {
@@ -228,15 +211,6 @@ describe('Player management', function () {
 		const games = partie.getPlayerGames(player);
 		assert.strictEqual(games.length, gamesNumber);
 	});
-
-	it('should remove a game', function () {
-		const host = 'abraracourcix';
-		const id = partie.createGame(host);
-
-		assert.strictEqual(partie.getHost(id), host);
-		partie.removeGame(id);
-		assert.strictEqual(partie.getHost(id), null);
-	});
 });
 
 /*-------------------- Game management -------------------- */
@@ -247,26 +221,9 @@ describe('Game management', function () {
 
 		const id = partie.createGame('Asterix');
 
-		let topStack = partie.getTopPile(id);
+		const topStack = partie.getTopPile(id);
 		assert.notStrictEqual(topStack, null);
-
-		let last = topStack;
-		for (let i = 0; i < 3; i++) {
-			topStack = partie.getTopPile(id);
-			assert.notStrictEqual(topStack, last);
-			last = topStack;
-		}
-	});
-
-	it('should return null when stack is empty', function () {
-		const id = partie.createGame('Idefix');
-
-		let nbOfCards = 0;
-		while (partie.getTopPile(id) != null) {
-			nbOfCards++;
-		}
-		assert.strictEqual(nbOfCards > 0, true);
-		assert.strictEqual(partie.getTopPile(id), null);
+		assert.strictEqual(topStack, partie.getTopPile(id));
 	});
 
 	it('should return the turn number', function () {
@@ -277,10 +234,10 @@ describe('Game management', function () {
 	});
 
 	it('should add a new card', function () {
-		assert.strictEqual(partie.addCard(12, wrongId), false);
+		assert.strictEqual(partie.addCard(wrongId, 'jbernard', 12), false);
 
 		const id = partie.createGame('Panoramix');
-		assert.strictEqual(partie.addCard(id, 4), true);
+		assert.strictEqual(partie.addCard(id, 'Panoramix', 4), true);
 	});
 
 	it('should return scores of players', function () {
@@ -303,22 +260,6 @@ describe('Game management', function () {
 
 		const id = partie.createGame('fabian');
 		assert.strictEqual(partie.initGame(id), true);
-
-		let isLower = true,
-			card = null,
-			lastCard = null;
-		while ((card = partie.getTopPile(id)) != null) {
-			if (!lastCard) {
-				lastCard = card;
-				continue;
-			}
-			if (card > lastCard) {
-				isLower = false;
-			}
-			lastCard = card;
-		}
-
-		assert.strictEqual(isLower, false);
 	});
 
 	it('should launch the game', function () {
