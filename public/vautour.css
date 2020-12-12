@@ -725,3 +725,302 @@ button#syntheseBtn {
 #syntheseParam.afficherFenetre {
 	display: block;
 }
+
+/* -------------------- Partie en cours -------------------- */
+.displayed {
+	display: block;
+}
+
+/* Basic shape of all the cards */
+.pioche .top-pioche,
+.carte-main,
+.selected-card,
+#choix-cartes-autres > span {
+	position: absolute;
+	padding: 85px 55px;
+	border-radius: 10%;
+	min-width: 100px;
+	background-color: rgb(255, 254, 248);
+	min-height: 150px;
+	max-height: 150px;
+	max-width: 120px;
+	box-shadow: -1px 2px 1px 1px rgba(0, 0, 0, 0.6);
+}
+
+/* ----------- Card's border -------------*/
+.pioche .top-pioche div,
+.carte-main div,
+.selected-card div,
+#choix-cartes-autres > span > div {
+	position: absolute;
+	top: 2.5%;
+	left: 4%;
+	height: 95%;
+	width: 92%;
+	border-radius: 10%;
+}
+
+/* --------- Other players' cards ---------*/
+#choix-cartes-autres {
+	display: flex;
+	justify-content: center;
+	position: absolute;
+	top: 10%;
+	left: 8.5%;
+	width: 50%;
+}
+
+#choix-cartes-autres > span {
+	position: relative;
+	transform-style: preserve-3d;
+	transition: 1s 0.2s;
+	margin-left: 5%;
+	margin-right: 5%;
+	transform: rotateY(0deg) translateX(-25%);
+}
+
+#choix-cartes-autres > span > div {
+	/* Turn the inner card to not have it inversed */
+	transform: rotateY(180deg);
+}
+
+#choix-cartes-autres .face-cachee span {
+	display: none;
+}
+
+#choix-cartes-autres .face-visible::before,
+#choix-cartes-autres .face-visible::after {
+	position: absolute;
+	content: attr(value);
+}
+
+#choix-cartes-autres .face-visible::before {
+	top: 5%;
+	left: 7.5%;
+}
+
+#choix-cartes-autres .face-visible::after {
+	bottom: 5%;
+	right: 7.5%;
+}
+
+#choix-cartes-autres #J1 .face-cachee {
+	background-color: rgb(45, 141, 252);
+}
+
+#choix-cartes-autres #J1 .face-visible {
+	border: 2px rgb(45, 141, 252) solid;
+}
+
+#choix-cartes-autres #J1 .face-visible::before,
+#choix-cartes-autres #J1 .face-visible::after {
+	color: rgb(45, 141, 252);
+}
+
+#choix-cartes-autres #J1 .face-visible span {
+	background-color: rgb(45, 141, 252);
+}
+
+#choix-cartes-autres #J2 .face-cachee {
+	background-color: rgb(255, 36, 47);
+}
+
+#choix-cartes-autres #J2 .face-visible {
+	border: 2px rgb(255, 36, 47) solid;
+}
+
+#choix-cartes-autres #J2 .face-visible::before,
+#choix-cartes-autres #J2 .face-visible::after {
+	color: rgb(255, 36, 47);
+}
+
+#choix-cartes-autres #J2 .face-visible span {
+	background-color: rgb(255, 36, 47);
+}
+
+#choix-cartes-autres #J3 .face-cachee {
+	background-color: rgb(255, 217, 0);
+}
+
+#choix-cartes-autres #J3 .face-visible {
+	border: 2px rgb(255, 217, 0) solid;
+}
+
+#choix-cartes-autres #J3 .face-visible::before,
+#choix-cartes-autres #J3 .face-visible::after {
+	color: rgb(255, 217, 0);
+}
+
+#choix-cartes-autres #J3 .face-visible span {
+	background-color: rgb(255, 217, 0);
+}
+
+#choix-cartes-autres #J4 .face-cachee {
+	background-color: rgb(221, 42, 191);
+}
+
+#choix-cartes-autres #J4 .face-visible {
+	border: 2px rgb(221, 42, 191) solid;
+}
+
+#choix-cartes-autres #J4 .face-visible::before,
+#choix-cartes-autres #J4 .face-visible::after {
+	color: rgb(221, 42, 191);
+}
+
+#choix-cartes-autres #J4 .face-visible span {
+	background-color: rgb(221, 42, 191);
+}
+
+/*-------- Pile --------*/
+.pioche .top-pioche {
+	position: absolute;
+	top: 37.5%;
+	left: 30%;
+}
+
+.pioche .top-pioche span {
+	background-color: #000;
+}
+
+.pioche .top-pioche div {
+	border: 2px black solid;
+}
+
+/*--------- Player's cards ----------*/
+
+/* card's main number  */
+.carte-main span,
+.selected-card span,
+.pioche .top-pioche span,
+#choix-cartes-autres .face-visible span {
+	text-align: center;
+	font-size: xx-large;
+	font-weight: bold;
+	position: absolute;
+	top: 25%;
+	left: 0%;
+	padding-top: 20%;
+	padding-bottom: 20%;
+	width: 100%;
+	color: white;
+}
+
+.selected-card {
+	bottom: 23%;
+	left: 30%;
+}
+
+.carte-main {
+	bottom: 3%;
+	cursor: pointer;
+}
+
+.carte-main::before,
+.selected-card::before {
+	position: absolute;
+	top: 8%;
+	left: 10%;
+	color: rgb(82, 211, 82);
+}
+
+.carte-main::after,
+.selected-card::after {
+	position: absolute;
+	bottom: 8%;
+	right: 10%;
+	color: rgb(82, 211, 82);
+}
+
+/*  card's frames */
+
+.carte-main div,
+.selected-card div {
+	border: 2px rgb(82, 211, 82) solid;
+}
+
+.carte-main span,
+.selected-card span {
+	background-color: rgb(82, 211, 82);
+}
+.carte-main:hover {
+	transform: translateY(-70%);
+	transition-duration: 1s;
+}
+
+/* ALL 15 cards in hand */
+.carte-main {
+	z-index: attr(data-value);
+	left: 2.5%;
+}
+
+.carte-joueur::before,
+.carte-joueur::after {
+	content: attr(value);
+}
+
+.carte-joueur[value='2'] {
+	left: 6.5%;
+}
+
+.carte-joueur[value='3'] {
+	left: 10.5%;
+}
+
+.carte-joueur[value='4'] {
+	left: 14.5%;
+}
+
+.carte-joueur[value='5'] {
+	left: 18.5%;
+}
+.carte-joueur[value='6'] {
+	left: 22.5%;
+}
+.carte-joueur[value='7'] {
+	left: 26.5%;
+}
+
+.carte-joueur[value='8'] {
+	left: 30.5%;
+}
+
+.carte-joueur[value='9'] {
+	left: 34.5%;
+}
+
+.carte-joueur[value='10'] {
+	left: 38.5%;
+}
+
+.carte-joueur[value='11'] {
+	left: 42.5%;
+}
+
+.carte-joueur[value='12'] {
+	left: 46.5%;
+}
+
+.carte-joueur[value='13'] {
+	left: 50.5%;
+}
+
+.carte-joueur[value='14'] {
+	left: 54.5%;
+}
+
+.carte-joueur[value='15'] {
+	left: 58.5%;
+}
+
+/* --------- Score ------------ */
+#scores {
+	position: absolute;
+	top: 10%;
+	left: 57%;
+}
+
+#scores h3 {
+	font-size: larger;
+	font-weight: 700;
+}

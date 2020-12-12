@@ -634,21 +634,111 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	/**
+	 * Créer une carte choisie par un autre joueur
+	 *
+	 * @param {*} value La valeur de la carte choisie
+	 * @param {int} numJoueur Le numéro du joueur à qui appartient la carte
+	 */
+	function creerCarteAutreJoueur(value, numJoueur) {
+		const carteAutreJoueur = document.createElement('span');
+		carteAutreJoueur.innerHTML = `<div class=face-cachee value="${value}"><span>${value}</span><div>`;
+		carteAutreJoueur.id = `J${numJoueur}`;
+		// Mode admin (triche autorisée)
+		if (utilisateurActuel.match(/^(fred|Fred)$/)) {
+			console.log('ADMIN MOD');
+			carteAutreJoueur.addEventListener('click', retournerCarte);
+		}
+		document
+			.getElementById('choix-cartes-autres')
+			.appendChild(carteAutreJoueur);
+	}
+
+	/**
+	 * Retourne une carte
+	 *
+	 * @param {*} e élément déclanchant l'évènement
+	 */
+	function retournerCarte(e) {
+		console.log('retourner carte');
+		let target = e.target;
+		while (target != null && !target.id.match(/^J[1-5]$/)) {
+			target = target.parentElement;
+		}
+		if (target != null) {
+			target.style = 'transform:rotateY(180deg) translateX(25%);';
+			target = target.children[0];
+			setTimeout(() => {
+				target.classList.remove('face-cachee');
+				target.classList.add('face-visible');
+			}, 500);
+		}
+	}
+
+	/**
 	 * Créer une carte de la main du joueur
 	 */
 	function creerCarteMainJoueur(value) {
 		const nouvelleCarte = document.createElement('span');
-		nouvelleCarte.innerText = value;
-		nouvelleCarte.id = `carte-main-${value}`;
-		nouvelleCarte.classList.add('carte-main');
-		nouvelleCarte.addEventListener('click', value => {
-			sock.emit('carte-choisie', {
-				id: partieActuelle,
-				from: utilisateurActuel,
-				value: value,
-			});
-		});
+		nouvelleCarte.innerHTML = `<div><span>${value}</span></div>`;
+		nouvelleCarte.setAttribute('value', value);
+		nouvelleCarte.classList = 'carte-main carte-joueur';
+		nouvelleCarte.addEventListener('click', eventCarte);
+
+		nouvelleCarte.addEventListener('mouseleave', eventMouseleaveCarte);
 		return nouvelleCarte;
+	}
+
+	/**
+	 * Envoi un message au serveur pour l'informer de la carte choisie
+	 * Place la carte en position de carte choisie
+	 *
+	 * @param {element} e L'élément de l'évènement
+	 */
+	function eventCarte(e) {
+		sock.emit('carte-choisie', {
+			id: partieActuelle,
+			from: utilisateurActuel,
+			value: e.target.innerText,
+		});
+
+		// On remonte le dom jusqu'à trouver l'élément de base de la carte
+		let target = e.target;
+		while (!target.classList.contains('carte-main')) {
+			target = target.parentElement;
+		}
+		target.removeEventListener('mouseleave', eventMouseleaveCarte);
+		target.style = 'transition: 2s;';
+		let selectedCards = document.getElementsByClassName('selected-card');
+		for (let elem of selectedCards) {
+			elem.classList.remove('selected-card');
+		}
+		target.classList.add('selected-card');
+		target.classList.remove('carte-main');
+		target.style.left = '30%';
+		toggleEventCarte(false);
+	}
+
+	/**
+	 * Ajoute ou enlève un listener d'évènements aux cartes du joueur
+	 *
+	 * @param {boolean} addEvent Indique s'il faut ajouter ou enlever le listener
+	 */
+	function toggleEventCarte(addEvent) {
+		let cartes = document.getElementsByClassName('carte-main');
+		for (let carte of cartes) {
+			if (addEvent) {
+				carte.addEventListener('click', eventCarte);
+			} else {
+				carte.removeEventListener('click', eventCarte);
+			}
+		}
+	}
+
+	/**
+	 * Abaisse les cartes lorsqu'elles ne sont plus hover
+	 */
+	function eventMouseleaveCarte(e) {
+		e.target.style = 'translateY:70%;transition-duration: 1s;';
 	}
 
 	/**
@@ -730,19 +820,22 @@ document.addEventListener('DOMContentLoaded', () => {
 		sock.on('infos-partie', data => {
 			UIGame.game.innerHTML = '';
 			if (!data.isLaunched) {
+				document.getElementsByTagName('h1')[0].style.display = 'block';
 				let listeInvitations = document.createElement('div');
 				listeInvitations.id = 'liste-invitations';
 				UIGame.game.append(listeInvitations);
 
 				afficherListeJoueurs(data.hote, data.invitations);
 			} else {
+				document.getElementsByTagName('h1')[0].style.display = 'none';
 				// Afficher la partie
 				let htmlstr =
 					'<div id="choix-cartes-autres"></div><div id="scores"><h3>Scores</h3>';
+
 				for (let player in data.score) {
 					htmlstr += `<p id="score-${player}">${player} : ${data.score[player]}</p>`;
 				}
-				htmlstr += `</div><div class="pioche" id="${data.pile}">${data.pile}</div><div id="choix-carte"></div>`;
+				htmlstr += `</div><div class="pioche"><div class="top-pioche" id="${data.pile}"><div><span>${data.pile}</span></div></div></div>`;
 
 				UIGame.game.insertAdjacentHTML('afterbegin', htmlstr);
 
@@ -755,6 +848,11 @@ document.addEventListener('DOMContentLoaded', () => {
 					}
 				}
 				UIGame.game.insertAdjacentElement('beforeend', mainJoueur);
+				// FOR TEST AND PIPELINE
+				creerCarteAutreJoueur(1, 1);
+				creerCarteAutreJoueur(14, 2);
+				creerCarteAutreJoueur(5, 3);
+				creerCarteAutreJoueur(10, 4);
 			}
 		});
 	}
@@ -782,7 +880,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			});
 			UIChat.radio.checked = true;
 			delete partiesStupideVautour[partieActuelle];
-			// afficherParties();
 		}
 	});
 	// Synthèse vocale
