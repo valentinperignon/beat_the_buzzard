@@ -257,11 +257,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		const encouragerLeJoueur = {
 			carteVautour: [
 				'Nul. Nul. Nul... Et ? Nul.',
-				"T'as compris que tu ne dois pas obtenir les cartes souris ?",
+				"T'as compris que tu ne dois pas obtenir les cartes vautours ?",
 				"Encore des points en moins ? T'as de la chance, je sais coder la valeur moins infinie.",
 			],
 			aucuneCarte: [
-				'Bonne nouvelle : tu ne perds aucun point. Mauvaise nouvelle: tu ne gagnes aucun point.',
+				'Bonne nouvelle : tu ne perds aucun point. Mauvaise nouvelle: tu ne gagnes aucun point non plus.',
 				"C'est gentil d'aider les autres joueurs à gagner.",
 				'Espèce de petit joueur.',
 			],
@@ -709,9 +709,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Créer une carte choisie par un autre joueur
 	 *
 	 * @param {*} value La valeur de la carte choisie
-	 * @param {int} numJoueur Le numéro du joueur à qui appartient la carte
+	 * @param {string}joueur Le joueur à qui appartient la carte, nécéssaire pour avoir sa couleur
 	 */
-	function creerCarteAutreJoueur(value, numJoueur) {
+	function creerCarteAutreJoueur(value, joueur) {
+		let numJoueur =
+			[...partiesStupideVautour[partieActuelle]].indexOf(joueur) + 1;
+		console.log(numJoueur);
 		const carteAutreJoueur = document.createElement('span');
 		carteAutreJoueur.innerHTML = `<div class=face-cachee value="${value}"><span>${value}</span><div>`;
 		carteAutreJoueur.id = `J${numJoueur}`;
@@ -737,7 +740,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			target = target.parentElement;
 		}
 		if (target != null) {
-			target.style = 'transform:rotateY(180deg) translateX(25%);';
+			target.style = 'transform:rotateY(180deg) translateX(50%);';
 			target = target.children[0];
 			setTimeout(() => {
 				target.classList.remove('face-cachee');
@@ -753,10 +756,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		const nouvelleCarte = document.createElement('span');
 		nouvelleCarte.innerHTML = `<div><span>${value}</span></div>`;
 		nouvelleCarte.setAttribute('value', value);
+		// Assigne un numéro de couleur au joueur
+		let numCouleur =
+			[...partiesStupideVautour[partieActuelle]].indexOf(utilisateurActuel) + 1;
+		nouvelleCarte.setAttribute('clr', numCouleur);
 		nouvelleCarte.classList = 'carte-main carte-joueur';
 		nouvelleCarte.addEventListener('click', eventCarte);
-		nouvelleCarte.addEventListener('mouseleave', eventMouseleaveCarte);
 
+		nouvelleCarte.addEventListener('mouseleave', eventMouseleaveCarte);
 		return nouvelleCarte;
 	}
 
@@ -910,15 +917,15 @@ document.addEventListener('DOMContentLoaded', () => {
 			for (let player in scores) {
 				htmlstr += `<p id="score-${player}">${player} : ${scores[player]}</p>`;
 			}
-			htmlstr += `</div><div class="pioche"><div class="top-pioche" id="${data.pile}">`;
+			htmlstr += `</div><div id="pioche-div"><div class="pioche"><div><p>?<p></div></div><div class="top-pioche" id="${data.pile}">`;
 			for (let card of data.pile) {
 				htmlstr += `<div><span>${card}</span></div>`;
 			}
-			htmlstr += '</div></div></div><div id="choix-carte"></div>';
+			htmlstr += `</div></div>`;
 
 			UIGame.game.insertAdjacentHTML('afterbegin', htmlstr);
 
-			// Ajout des cartes de la main du joueurs
+			// Ajout  des cartes de la main du joueurs
 			let mainJoueur = document.createElement('div');
 			mainJoueur.id = 'main-joueur';
 			for (let i = 0; i < data.hand.length; i++) {
@@ -926,17 +933,24 @@ document.addEventListener('DOMContentLoaded', () => {
 					mainJoueur.append(creerCarteMainJoueur(data.hand[i]));
 				}
 			}
-			// FOR TEST AND PIPELINE
-			creerCarteAutreJoueur(1, 1);
-			creerCarteAutreJoueur(14, 2);
-			creerCarteAutreJoueur(5, 3);
-			creerCarteAutreJoueur(10, 4);
 			UIGame.game.insertAdjacentElement('beforeend', mainJoueur);
+			// FOR TEST AND PIPELINE
+			creerCarteAutreJoueur(1, 'val');
+			creerCarteAutreJoueur(14, 'fred');
+			retournerPioche(7);
 		}
 	}
 
 	function getRandomNumber(max, min = 0) {
 		return Math.floor(Math.random() * max) + min;
+	}
+
+	function retournerPioche(value) {
+		const topPioche = document.createElement('div');
+		topPioche.classList.add('pioche');
+		topPioche.innerHTML = '<div><p>?<p></div>';
+		topPioche.id = value;
+		document.getElementById('pioche-div').appendChild(topPioche);
 	}
 
 	/* -------------------- Ecouteurs -------------------- */
