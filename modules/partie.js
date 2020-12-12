@@ -5,6 +5,8 @@
 let games = {};
 let maxId = 0;
 
+const FINAL_TURN = 15;
+
 function Player(name, isAI = false) {
 	this.name = name;
 	this.isAI = isAI;
@@ -24,7 +26,9 @@ function createGame(host) {
 		invitations: [],
 		isLaunched: false,
 		pile: [-5, -4, -3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-		chosenCards: [],
+		topPile: [],
+		chosenCards: {},
+		hasPlayed: [],
 		numTurn: 1,
 	};
 	games[id].playersList[host] = new Player(host);
@@ -52,11 +56,6 @@ function removeInvite(id, player) {
 function isInvited(id, player) {
 	if (!games[id]) return false;
 	return games[id].invitations.includes(player);
-}
-
-function getNbInvite(id) {
-	if (!games[id]) return 0;
-	return games[id].invitations.length;
 }
 
 function getInvite(id) {
@@ -164,9 +163,21 @@ function removePlayer(id, p) {
 
 /****************  Functions for the game itself  *******************/
 
+function clearTopPile(id) {
+	if (!games[id]) return;
+	games[id].topPile = [];
+}
+
+function popTopPile(id) {
+	if (!games[id] || games[id].pile.length == 0) return;
+
+	const newValue = games[id].pile.pop();
+	games[id].topPile.push(newValue);
+}
+
 function getTopPile(id) {
 	if (!games[id]) return null;
-	return games[id].pile.length == 0 ? null : games[id].pile.pop();
+	return games[id].topPile;
 }
 
 function getNumTurn(id) {
@@ -174,16 +185,74 @@ function getNumTurn(id) {
 	return games[id].numTurn;
 }
 
-function addCard(val, id) {
-	if (!games[id]) return false;
-	games[id].chosenCards.push(val);
+function addCard(id, player, value) {
+	value = Number(value);
+	if (
+		!games[id] ||
+		!games[id].playersList[player].hand.includes(value) ||
+		games[id].hasPlayed.includes(player)
+	) {
+		return false;
+	}
+
+	// Remove card from player's hand
+	games[id].playersList[player].hand.splice(
+		games[id].playersList[player].hand.indexOf(value),
+		1
+	);
+
+	if (games[id].chosenCards[value]) {
+		games[id].chosenCards[value].push(player);
+	} else {
+		games[id].chosenCards[value] = [player];
+	}
+	games[id].hasPlayed.push(player);
 	return true;
+}
+
+function getCardPlayedNb(id) {
+	if (!games[id]) return 0;
+	return games[id].hasPlayed.length;
 }
 
 /**
  * Play a turn of the game
  */
-function playTurn() {}
+function playTurn(id) {
+	if (!games[id]) return null;
+
+	const cardStack = getTopPile(id).reduce(
+		(accumulator, val) => accumulator + val
+	);
+
+	const cardPlayed = Object.keys(games[id].chosenCards).sort((a, b) => {
+		if (cardStack > 0) {
+			return a - b;
+		}
+		return b - a;
+	});
+	let winner = null;
+	do {
+		const currentCard = cardPlayed.pop();
+		if (games[id].chosenCards[currentCard].length > 1) {
+			continue;
+		}
+
+		winner = games[id].chosenCards[currentCard][0];
+	} while (!winner && cardPlayed.length > 0);
+
+	if (winner !== null) {
+		updateScore(id, winner, cardStack);
+		clearTopPile(id);
+	}
+
+	games[id].chosenCards = {};
+	games[id].numTurn += 1;
+	games[id].hasPlayed = [];
+	popTopPile(id);
+
+	return winner;
+}
 
 /**
  * return a JSON object which contains all the players' scores
@@ -223,20 +292,49 @@ function initGame(id) {
 
 	games[id].isLaunched = true;
 	shuffleCards(id);
+	popTopPile(id);
 	return true;
 }
 
-function endGame(game) {
-	console.log(game);
-	console.log('TO-DO : end the game and return the winner');
+function updateScore(id, player, points) {
+	if (!games[id] || !games[id].playersList[player]) return;
+	games[id].playersList[player].score += points;
+}
+
+function endGame(id) {
+	if (!games[id]) return null;
+
+	let scores = {};
+	for (let player in games[id].playersList) {
+		const currentScore = games[id].playersList[player].score;
+		if (!scores[currentScore]) {
+			scores[currentScore] = [player];
+		} else {
+			scores[currentScore].push(player);
+		}
+	}
+
+	const scoresValues = Object.keys(scores);
+	scoresValues.sort();
+
+	let winner = null;
+	do {
+		const currentScore = scoresValues.pop();
+		if (scores[currentScore].length > 1) {
+			continue;
+		}
+
+		winner = scores[currentScore][0];
+	} while (!winner && scores.length > 0);
+
+	removeGame(id);
+	return winner;
 }
 
 module.exports = {
 	createGame,
-	removeGame,
 	addInvite,
 	isInvited,
-	getNbInvite,
 	getPlayerGames,
 	getHost,
 	getInvite,
@@ -246,6 +344,7 @@ module.exports = {
 	removeInvite,
 	getScores,
 	getTopPile,
+	getCardPlayedNb,
 	playTurn,
 	getPlayersList,
 	addPlayer,
@@ -253,4 +352,5 @@ module.exports = {
 	getNumTurn,
 	addCard,
 	endGame,
+	FINAL_TURN,
 };

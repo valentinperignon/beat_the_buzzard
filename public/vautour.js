@@ -66,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	};
 
 	// synthèse vocale
-
 	let syntheseVocale = null;
 
 	/* -------------------- Réception des messages du serveur -------------------- */
@@ -109,7 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	sock.on('message', msg => {
 		if (utilisateurActuel) {
 			afficherMessage(msg);
-			readMessage(msg);
+
+			if (msg.from.startsWith(utilisateurActuel) || msg.from === '[admin]') {
+				return;
+			}
+			parler(`${msg.from} dit ${msg.text}`);
 		}
 	});
 
@@ -190,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
 						document
 							.getElementById('labelJouerBtn')
 							.addEventListener('click', () => {
-								sock.emit('jouer-vautour', data.id);
+								sock.emit('vautour-init', data.id);
 							});
 					}
 				} else {
@@ -206,6 +209,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
+	/**
+	 * Partie de Stupide Vautour annulée
+	 */
 	sock.on('partie-annule', () => {
 		const popup = document.createElement('div');
 		document.body.appendChild(popup);
@@ -217,6 +223,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		UIChat.radio.checked = true;
 	});
 
+	/**
+	 * Liste des joueurs participant à une partie
+	 */
 	sock.on('vautour-liste', data => {
 		partiesStupideVautour[data.id] = new Set(data.liste);
 
@@ -234,9 +243,77 @@ document.addEventListener('DOMContentLoaded', () => {
 		afficherMessage(msg);
 	});
 
-	sock.on('debut-partie', () => {
-		afficherParties();
+	/**
+	 * Début d'une partie de Stupide Vautour
+	 */
+	sock.on('vautour-init', data => {
+		renderVautour(data, true);
 	});
+
+	/**
+	 * Nouveau tour de jeu dans une partie de Stupide Vautour
+	 */
+	sock.on('vautour-nouveau-tour', data => {
+		const encouragerLeJoueur = {
+			carteVautour: [
+				'Nul. Nul. Nul... Et ? Nul.',
+				"T'as compris que tu ne dois pas obtenir les cartes souris ?",
+				"Encore des points en moins ? T'as de la chance, je sais coder la valeur moins infinie.",
+			],
+			aucuneCarte: [
+				'Bonne nouvelle : tu ne perds aucun point. Mauvaise nouvelle: tu ne gagnes aucun point.',
+				"C'est gentil d'aider les autres joueurs à gagner.",
+				'Espèce de petit joueur.',
+			],
+		};
+
+		const carteNumero = Number(document.querySelector('.pioche').innerText);
+
+		if (data.winner === utilisateurActuel) {
+			if (carteNumero > 0) {
+				alert("C'est gagné ! Vous remportez la carte Souris.");
+			} else {
+				alert("C'est perdu ! Vous obtenez la carte Vautour.");
+				parler(
+					encouragerLeJoueur.carteVautour[
+						getRandomNumber(encouragerLeJoueur.carteVautour.length)
+					]
+				);
+			}
+		} else {
+			if (carteNumero > 0 && getRandomNumber(5) === 0) {
+				parler(
+					encouragerLeJoueur.aucuneCarte[
+						getRandomNumber(encouragerLeJoueur.aucuneCarte.length)
+					]
+				);
+			}
+		}
+
+		delete data.winner;
+		renderVautour(data, true);
+	});
+
+	/**
+	 * Fin d'une partie de Stupide Vautour
+	 */
+	sock.on('vautour-fin-partie', data => {
+		if (!data.winner) {
+			alert("Fin de la partie ! Personne n'a gagné...");
+			return;
+		}
+
+		if (data.winner === utilisateurActuel) {
+			alert('Bravo ! Vous avez gagné cette partie.');
+		} else {
+			alert(`C'est perdu... ${data.winner} gagne la partie.`);
+		}
+	});
+
+	/**
+	 * Affichage des erreurs lors d'une partie de jeu
+	 */
+	sock.on('vautour-erreur', data => alert(data));
 
 	/**
 	 * Déconnexion d'un utilisateur
@@ -419,15 +496,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	/**
 	 * Lire un message avec la synthèse vocale
-	 * @param object msg { from: auteur, text: texte du message, date: horodatage (ms) }
+	 * @param string Texte à prononcer
 	 */
-	function readMessage(msg) {
+	function parler(text) {
+		// Initialiser la synthèse vocale
 		if (syntheseVocale === null) {
 			syntheseVocale = JSON.parse(
 				localStorage.getItem(`voice_${utilisateurActuel}`)
 			);
 			if (syntheseVocale === null) {
-				// valeur par défaut
 				syntheseVocale = {
 					active: true,
 					volume: 0.2,
@@ -435,16 +512,11 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		}
 
-		if (
-			!syntheseVocale.active ||
-			typeof speechSynthesis === 'undefined' ||
-			msg.from.startsWith(utilisateurActuel) ||
-			msg.from === '[admin]'
-		) {
+		if (!syntheseVocale.active || typeof speechSynthesis === 'undefined') {
 			return;
 		}
 
-		let hearThis = new SpeechSynthesisUtterance(`${msg.from} dit ${msg.text}`);
+		let hearThis = new SpeechSynthesisUtterance(text);
 		hearThis.lang = 'fr-FR';
 		hearThis.volume = syntheseVocale.volume;
 		speechSynthesis.speak(hearThis);
@@ -683,8 +755,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		nouvelleCarte.setAttribute('value', value);
 		nouvelleCarte.classList = 'carte-main carte-joueur';
 		nouvelleCarte.addEventListener('click', eventCarte);
-
 		nouvelleCarte.addEventListener('mouseleave', eventMouseleaveCarte);
+
 		return nouvelleCarte;
 	}
 
@@ -695,7 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * @param {element} e L'élément de l'évènement
 	 */
 	function eventCarte(e) {
-		sock.emit('carte-choisie', {
+		sock.emit('vautour-choix-carte', {
 			id: partieActuelle,
 			from: utilisateurActuel,
 			value: e.target.innerText,
@@ -816,45 +888,55 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Affiche la partie selectionnée par l'utilisateur dans la navbar
 	 */
 	function afficherParties() {
-		sock.emit('infos-partie', { id: partieActuelle, from: utilisateurActuel });
-		sock.on('infos-partie', data => {
-			UIGame.game.innerHTML = '';
-			if (!data.isLaunched) {
-				document.getElementsByTagName('h1')[0].style.display = 'block';
-				let listeInvitations = document.createElement('div');
-				listeInvitations.id = 'liste-invitations';
-				UIGame.game.append(listeInvitations);
+		sock.emit('vautour-infos', { id: partieActuelle, from: utilisateurActuel });
+		sock.on('vautour-infos', data => renderVautour(data, data.isLaunched));
+	}
 
-				afficherListeJoueurs(data.hote, data.invitations);
-			} else {
-				document.getElementsByTagName('h1')[0].style.display = 'none';
-				// Afficher la partie
-				let htmlstr =
-					'<div id="choix-cartes-autres"></div><div id="scores"><h3>Scores</h3>';
+	function renderVautour(data, isLaunched) {
+		UIGame.game.innerHTML = '';
+		if (!isLaunched) {
+			document.getElementsByTagName('h1')[0].style.display = 'block';
+			let listeInvitations = document.createElement('div');
+			listeInvitations.id = 'liste-invitations';
+			UIGame.game.append(listeInvitations);
 
-				for (let player in data.score) {
-					htmlstr += `<p id="score-${player}">${player} : ${data.score[player]}</p>`;
-				}
-				htmlstr += `</div><div class="pioche"><div class="top-pioche" id="${data.pile}"><div><span>${data.pile}</span></div></div></div>`;
-
-				UIGame.game.insertAdjacentHTML('afterbegin', htmlstr);
-
-				// Ajout  des cartes de la main du joueurs
-				let mainJoueur = document.createElement('div');
-				mainJoueur.id = 'main-joueur';
-				for (let i = 0; i < data.hand.length; i++) {
-					if (data.hand[i] != undefined) {
-						mainJoueur.append(creerCarteMainJoueur(data.hand[i]));
-					}
-				}
-				UIGame.game.insertAdjacentElement('beforeend', mainJoueur);
-				// FOR TEST AND PIPELINE
-				creerCarteAutreJoueur(1, 1);
-				creerCarteAutreJoueur(14, 2);
-				creerCarteAutreJoueur(5, 3);
-				creerCarteAutreJoueur(10, 4);
+			afficherListeJoueurs(data.hote, data.invitations);
+		} else {
+			document.getElementsByTagName('h1')[0].style.display = 'none';
+			// Afficher la partie
+			let htmlstr =
+				'<div id="choix-cartes-autres"></div><div id="scores"><h3>Scores</h3>';
+			const scores = JSON.parse(data.scores);
+			for (let player in scores) {
+				htmlstr += `<p id="score-${player}">${player} : ${scores[player]}</p>`;
 			}
-		});
+			htmlstr += `</div><div class="pioche"><div class="top-pioche" id="${data.pile}">`;
+			for (let card of data.pile) {
+				htmlstr += `<div><span>${card}</span></div>`;
+			}
+			htmlstr += '</div></div></div><div id="choix-carte"></div>';
+
+			UIGame.game.insertAdjacentHTML('afterbegin', htmlstr);
+
+			// Ajout des cartes de la main du joueurs
+			let mainJoueur = document.createElement('div');
+			mainJoueur.id = 'main-joueur';
+			for (let i = 0; i < data.hand.length; i++) {
+				if (data.hand[i] != undefined) {
+					mainJoueur.append(creerCarteMainJoueur(data.hand[i]));
+				}
+			}
+			// FOR TEST AND PIPELINE
+			creerCarteAutreJoueur(1, 1);
+			creerCarteAutreJoueur(14, 2);
+			creerCarteAutreJoueur(5, 3);
+			creerCarteAutreJoueur(10, 4);
+			UIGame.game.insertAdjacentElement('beforeend', mainJoueur);
+		}
+	}
+
+	function getRandomNumber(max, min = 0) {
+		return Math.floor(Math.random() * max) + min;
 	}
 
 	/* -------------------- Ecouteurs -------------------- */
