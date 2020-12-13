@@ -742,6 +742,8 @@ button#syntheseBtn {
 /* Basic shape of all the cards */
 .pioche,
 .top-pioche,
+.pioche-visible,
+.pioche-cachee,
 .carte-main,
 .selected-card,
 #choix-cartes-autres > span {
@@ -760,6 +762,8 @@ button#syntheseBtn {
 /* ----------- Card's border -------------*/
 .pioche div,
 .top-pioche div,
+.pioche-visible div,
+.pioche-cachee div,
 .carte-main div,
 .selected-card div,
 #choix-cartes-autres > span > div {
@@ -781,7 +785,22 @@ button#syntheseBtn {
 	width: 50%;
 }
 
+@keyframes slide-card {
+	0% {
+		top: -100%;
+	}
+	100% {
+		z-index: 1;
+		top: 0%;
+	}
+}
+#choix-cartes-autres .visible {
+	z-index: 1;
+}
+
 #choix-cartes-autres > span {
+	z-index: -1;
+	animation: slide-card 1s;
 	position: relative;
 	transform-style: preserve-3d;
 	transition: 1s 0.2s;
@@ -884,23 +903,6 @@ button#syntheseBtn {
 }
 
 /*-------- Pile --------*/
-.pioche {
-	position: absolute;
-	top: 37.5%;
-	left: 25%;
-}
-
-.pioche div {
-	background-color: #000;
-	color: white;
-}
-
-.pioche div p {
-	position: absolute;
-	font-size: 4em;
-	top: 30%;
-	left: 31%;
-}
 
 .top-pioche {
 	position: absolute;
@@ -908,12 +910,45 @@ button#syntheseBtn {
 	left: 35%;
 }
 
-.top-pioche span {
+.top-pioche div span,
+.pioche-visible div span {
 	background-color: #000;
+	width: 102%;
 }
 
-.top-pioche div {
+.top-pioche div,
+.pioche-visible div {
 	border: 2px black solid;
+}
+
+.pioche,
+.pioche-cachee,
+.pioche-visible {
+	position: absolute;
+	top: 37.5%;
+	left: 25%;
+}
+
+.pioche div,
+.pioche-cachee div {
+	background-color: #000;
+	color: white;
+}
+
+.pioche div p,
+.pioche-cachee div p {
+	position: absolute;
+	font-size: 4em;
+	top: 30%;
+	left: 31%;
+}
+
+.pioche-cachee {
+	transition: 2s 0.2s;
+}
+
+.pioche-visible span {
+	transform: rotateY(180deg);
 }
 
 /*--------- Player's cards ----------*/
@@ -922,6 +957,8 @@ button#syntheseBtn {
 .carte-main span,
 .selected-card span,
 .top-pioche span,
+.pioche-cachee span,
+.pioche-visible span,
 #choix-cartes-autres .face-visible span {
 	text-align: center;
 	font-size: xx-large;
@@ -1124,6 +1161,22 @@ button#syntheseBtn {
 }
 
 #scores h3 {
-	font-size: larger;
+	font-size: x-large;
 	font-weight: 700;
+}
+
+#scores p {
+	text-align: center;
+	font-size: large;
+	margin: 1em;
+}
+
+/* ---------- Disparition animation -----------*/
+.fade-out {
+	opacity: 0;
+	-webkit-transition: opacity 1s ease-in-out;
+	-moz-transition: opacity 1s ease-in-out;
+	-ms-transition: opacity 1s ease-in-out;
+	-o-transition: opacity 1s ease-in-out;
+	transition: opacity 1s ease-in-out;
 }
