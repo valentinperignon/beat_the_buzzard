@@ -176,25 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
 						.querySelector(`#cartes-autres #${data.from}`)
 						.classList.remove('carte-attente');
 					if (partiesStupideVautour[partieActuelle].size >= 2) {
-						// bouton pour lancer la partie
-						const jouerBouton = document.createElement('btn');
-						jouerBouton.innerText = 'Lancer la partie';
-						jouerBouton.setAttribute('id', 'jouerBtn');
-						UIGame.game.append(jouerBouton);
-						UIGame.game.insertAdjacentHTML(
-							'afterbegin',
-							'<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs><symbol id="arrow" viewBox="0 0 100 100"><path d="M12.5 45.83h64.58v8.33H12.5z"/><path d="M59.17 77.92l-5.84-5.84L75.43 50l-22.1-22.08 5.84-5.84L87.07 50z"/></symbol></defs></svg>'
-						);
-
-						UIGame.game.insertAdjacentHTML(
-							'beforeend',
-							'<label for="jouerBtn" class="button" id="labelJouerBtn"><span><svg><use xlink:href="#arrow" href="#arrow"></use></svg></span></label >'
-						);
-						document
-							.getElementById('labelJouerBtn')
-							.addEventListener('click', () => {
-								sock.emit('vautour-init', data.id);
-							});
+						creerBtnLancerPartie(data.id);
 					}
 				} else {
 					partiesStupideVautour[partieActuelle].delete(data.from);
@@ -213,13 +195,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Partie de Stupide Vautour annulée
 	 */
 	sock.on('partie-annule', () => {
-		const popup = document.createElement('div');
-		document.body.appendChild(popup);
-		popup.setAttribute('id', 'popup');
-		popup.innerHTML = `<p>La partie que vous tentez de rejoindre n'existe plus...</p><button>Fermer</button>`;
-		popup.addEventListener('click', () => {
-			document.body.removeChild(document.getElementById('popup'));
-		});
+		creerPopup(
+			"`<p>La partie que vous tentez de rejoindre n'existe plus...</p><button>Fermer</button>"
+		);
 		UIChat.radio.checked = true;
 	});
 
@@ -259,15 +237,22 @@ document.addEventListener('DOMContentLoaded', () => {
 				'Nul. Nul. Nul... Et ? Nul.',
 				"T'as compris que tu ne dois pas obtenir les cartes vautours ?",
 				"Encore des points en moins ? T'as de la chance, je sais coder la valeur moins infinie.",
+				'Pour attirer tous ces vautours, tu dois vraiment être une belle charogne.',
+				'Si tu continues comme ça, tu vas finir dans le caniveau.',
+				"J'ai rarement vu quelqu'un d'aussi mauvais à ce jeu.",
+				'Je me demande qui est le plus stupide, ce vautour ou toi ?',
 			],
 			aucuneCarte: [
 				'Bonne nouvelle : tu ne perds aucun point. Mauvaise nouvelle: tu ne gagnes aucun point non plus.',
+				'On est pas au uno ici, il faut gagner les cartes.',
 				"C'est gentil d'aider les autres joueurs à gagner.",
 				'Espèce de petit joueur.',
+				"Tu aurais mieux fait de travailler tes TP de scheme plutôt que de t'entrainer à ce jeu.",
+				"Tu l'auras la prochaine fois. Non je rigole t'es trop nul pour ça",
 			],
 		};
 
-		const carteNumero = Number(document.querySelector('.pioche').innerText);
+		const carteNumero = Number(document.querySelector('.top-pioche').innerText);
 
 		if (data.winner === utilisateurActuel) {
 			if (carteNumero > 0) {
@@ -714,7 +699,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	function creerCarteAutreJoueur(value, joueur) {
 		let numJoueur =
 			[...partiesStupideVautour[partieActuelle]].indexOf(joueur) + 1;
-		console.log(numJoueur);
 		const carteAutreJoueur = document.createElement('span');
 		carteAutreJoueur.innerHTML = `<div class=face-cachee value="${value}"><span>${value}</span><div>`;
 		carteAutreJoueur.id = `J${numJoueur}`;
@@ -732,9 +716,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Retourne une carte
 	 *
 	 * @param {*} e élément déclanchant l'évènement
+	 * @param {boolean} pioche true s'il faut retourner la pioche, faux sinon
 	 */
-	function retournerCarte(e) {
-		console.log('retourner carte');
+	function retournerCarte(e, pioche = false) {
 		let target = e.target;
 		while (target != null && !target.id.match(/^J[1-5]$/)) {
 			target = target.parentElement;
@@ -742,10 +726,40 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (target != null) {
 			target.style = 'transform:rotateY(180deg) translateX(50%);';
 			target = target.children[0];
+			let classe;
+			if (pioche) {
+				classe = 'pioche';
+			} else {
+				classe = 'face';
+			}
 			setTimeout(() => {
-				target.classList.remove('face-cachee');
-				target.classList.add('face-visible');
+				target.classList.remove(`${classe}-cachee`);
+				target.classList.add(`${classe}-visible`);
 			}, 500);
+		}
+	}
+
+	function retournerPioche(target, pioche = false) {
+		if (target != null) {
+			target.style = 'transform:rotateY(180deg) translateX(-120%);';
+			let classe;
+			if (pioche) {
+				classe = 'pioche';
+			} else {
+				classe = 'face';
+			}
+			setTimeout(() => {
+				target.classList.remove(`${classe}-cachee`);
+				target.classList.add(`${classe}-visible`);
+				if (pioche) {
+					target.innerHTML = `<div><span>${target.id}</span></div>`;
+				}
+			}, 600);
+			if (pioche) {
+				setTimeout(() => {
+					target.classList.add(`top-pioche`);
+				}, 2000);
+			}
 		}
 	}
 
@@ -795,6 +809,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		target.classList.remove('carte-main');
 		target.style.left = '30%';
 		toggleEventCarte(false);
+		retournerPioche(document.getElementsByClassName('pioche-cachee')[0], true);
 	}
 
 	/**
@@ -811,6 +826,42 @@ document.addEventListener('DOMContentLoaded', () => {
 				carte.removeEventListener('click', eventCarte);
 			}
 		}
+	}
+
+	function creerBtnLancerPartie(id) {
+		// bouton pour lancer la partie
+		const jouerBouton = document.createElement('btn');
+		jouerBouton.innerText = 'Lancer la partie';
+		jouerBouton.setAttribute('id', 'jouerBtn');
+		UIGame.game.append(jouerBouton);
+		UIGame.game.insertAdjacentHTML(
+			'afterbegin',
+			'<svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs><symbol id="arrow" viewBox="0 0 100 100"><path d="M12.5 45.83h64.58v8.33H12.5z"/><path d="M59.17 77.92l-5.84-5.84L75.43 50l-22.1-22.08 5.84-5.84L87.07 50z"/></symbol></defs></svg>'
+		);
+
+		UIGame.game.insertAdjacentHTML(
+			'beforeend',
+			'<label for="jouerBtn" class="button" id="labelJouerBtn"><span><svg><use xlink:href="#arrow" href="#arrow"></use></svg></span></label >'
+		);
+		document.getElementById('labelJouerBtn').addEventListener('click', () => {
+			if (partiesStupideVautour[partieActuelle].size < 2) {
+				creerPopup(
+					'<p>Vous êtes tout seul, vous ne pouvez pas démarrer de partie, invitez des amis !</p><button>Fermer</button>'
+				);
+			} else {
+				sock.emit('vautour-init', id);
+			}
+		});
+	}
+
+	function creerPopup(innerHtml) {
+		const popup = document.createElement('div');
+		document.body.appendChild(popup);
+		popup.setAttribute('id', 'popup');
+		popup.innerHTML = innerHtml;
+		popup.addEventListener('click', () => {
+			document.body.removeChild(document.getElementById('popup'));
+		});
 	}
 
 	/**
@@ -847,17 +898,21 @@ document.addEventListener('DOMContentLoaded', () => {
 				}
 			}
 		}
-		for (let inv of invitations) {
-			if (inv != undefined) {
-				const invit = creerCarteJoueur(inv, false);
-				invit.classList.add('carte-attente');
-				autresJoueur.append(invit);
+		if (invitations != null) {
+			for (let inv of invitations) {
+				if (inv != undefined) {
+					const invit = creerCarteJoueur(inv, false);
+					invit.classList.add('carte-attente');
+					autresJoueur.append(invit);
+				}
 			}
 		}
 		listeInvitations.append(autresJoueur);
 		// carte pour ajouter un joueur
 		if (
 			hote === utilisateurActuel &&
+			partiesStupideVautour[partieActuelle] != null &&
+			invitations != null &&
 			partiesStupideVautour[partieActuelle].size + invitations.length < 5
 		) {
 			creerCarteAjouterJoueur();
@@ -906,6 +961,12 @@ document.addEventListener('DOMContentLoaded', () => {
 			let listeInvitations = document.createElement('div');
 			listeInvitations.id = 'liste-invitations';
 			UIGame.game.append(listeInvitations);
+			if (
+				data.hote == utilisateurActuel &&
+				partiesStupideVautour[partieActuelle].size >= 2
+			) {
+				creerBtnLancerPartie(data.id);
+			}
 
 			afficherListeJoueurs(data.hote, data.invitations);
 		} else {
@@ -917,9 +978,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			for (let player in scores) {
 				htmlstr += `<p id="score-${player}">${player} : ${scores[player]}</p>`;
 			}
-			htmlstr += `</div><div id="pioche-div"><div class="pioche"><div><p>?<p></div></div><div class="top-pioche" id="${data.pile}">`;
+			htmlstr += `</div><div id="pioche-div"><div class="pioche"><div><p>?</p></div></div><div class="pioche-cachee" id="${data.pile}">`;
 			for (let card of data.pile) {
-				htmlstr += `<div><span>${card}</span></div>`;
+				htmlstr += `<div><p>?</p></div>`;
 			}
 			htmlstr += `</div></div>`;
 
@@ -937,20 +998,11 @@ document.addEventListener('DOMContentLoaded', () => {
 			// FOR TEST AND PIPELINE
 			creerCarteAutreJoueur(1, 'val');
 			creerCarteAutreJoueur(14, 'fred');
-			retournerPioche(7);
 		}
 	}
 
 	function getRandomNumber(max, min = 0) {
 		return Math.floor(Math.random() * max) + min;
-	}
-
-	function retournerPioche(value) {
-		const topPioche = document.createElement('div');
-		topPioche.classList.add('pioche');
-		topPioche.innerHTML = '<div><p>?<p></div>';
-		topPioche.id = value;
-		document.getElementById('pioche-div').appendChild(topPioche);
 	}
 
 	/* -------------------- Ecouteurs -------------------- */
@@ -974,8 +1026,16 @@ document.addEventListener('DOMContentLoaded', () => {
 				id: partieActuelle,
 				from: utilisateurActuel,
 			});
-			UIChat.radio.checked = true;
+			document.getElementsByClassName('currentGame')[0].remove();
 			delete partiesStupideVautour[partieActuelle];
+			partieActuelle = null;
+			if (document.getElementById('nav').firstChild) {
+				partieActuelle = document.getElementById('nav').firstChild.id;
+				document.getElementById('nav').firstChild.classList.add('currentGame');
+				afficherParties();
+			} else {
+				UIChat.radio.checked = true;
+			}
 		}
 	});
 	// Synthèse vocale
