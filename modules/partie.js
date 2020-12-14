@@ -30,6 +30,7 @@ function createGame(host) {
 		chosenCards: {},
 		hasPlayed: [],
 		numTurn: 1,
+		nbAI: 0,
 	};
 	games[id].playersList[host] = new Player(host);
 
@@ -76,6 +77,22 @@ function getHost(id) {
 function getHand(id, player) {
 	if (!games[id] || !games[id].playersList[player]) return null;
 	return games[id].playersList[player].hand;
+}
+
+function getNbAi(id) {
+	if (!games[id]) return false;
+	return games[id].nbAI;
+}
+
+function getAI(id) {
+	if (!games[id]) return null;
+	let AI_array = new Set();
+	for (const player in games[id].playersList) {
+		if (games[id].playersList[player].isAI) {
+			AI_array.add(player);
+		}
+	}
+	return AI_array;
 }
 
 function isLaunched(id) {
@@ -149,6 +166,8 @@ function removePlayer(id, p) {
 		// If the game has already started, replace the player by an AI
 		players[p].name = 'IA';
 		players[p].isAI = true;
+		players[p].hand = shuffleCards(players[p].hand);
+		++games[id].nbAI;
 	}
 
 	// If all the players are AI, end the game
@@ -208,6 +227,11 @@ function addCard(id, player, value) {
 	}
 	games[id].hasPlayed.push(player);
 	return true;
+}
+
+function getPlayerWhoPlayed(id) {
+	if (!games[id]) return 0;
+	return games[id].hasPlayed;
 }
 
 function getCardPlayedNb(id) {
@@ -274,12 +298,13 @@ function getScores(id) {
  *
  * @param id The id of the game
  */
-function shuffleCards(id) {
-	if (!games[id]) return;
-	games[id].pile = games[id].pile
+function shuffleCards(cards) {
+	if (!cards) return;
+	cards = cards
 		.map(n => ({ sort: Math.random(), value: n }))
 		.sort((a, b) => a.sort - b.sort)
 		.map(n => n.value);
+	return cards;
 }
 
 /**
@@ -291,7 +316,7 @@ function initGame(id) {
 	if (!games[id]) return false;
 
 	games[id].isLaunched = true;
-	shuffleCards(id);
+	games[id].pile = shuffleCards(games[id].pile);
 	popTopPile(id);
 	return true;
 }
@@ -340,11 +365,14 @@ module.exports = {
 	getInvite,
 	getHand,
 	isLaunched,
+	getNbAi,
+	getAI,
 	initGame,
 	removeInvite,
 	getScores,
 	getTopPile,
 	getCardPlayedNb,
+	getPlayerWhoPlayed,
 	playTurn,
 	getPlayersList,
 	addPlayer,

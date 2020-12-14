@@ -64,10 +64,10 @@ function envoyerListeVautour(id, player, estParti = false) {
 	}
 	for (let j in players) {
 		// envoie la nouvelle liste aux joueurs de la parties
-		if (clients[players[j]] !== undefined) {
+		if (clients[players[j]] !== undefined && !partieVautour.getAI(id).has(j)) {
 			clients[players[j]].emit('vautour-liste', {
 				id: id,
-				liste: partieVautour.getPlayersList(id),
+				liste: players,
 				hote: partieVautour.getHost(id),
 				invitations: partieVautour.getInvite(id),
 				msg: estParti
@@ -239,18 +239,38 @@ io.on('connection', function (socket) {
 			);
 			return;
 		}
-
+		// On fait jouer les IA
+		let AI = partieVautour.getAI(data.id);
+		let AICards = {};
+		for (let ai of AI) {
+			if (!partie.getPlayerWhoPlayed(data.id).includes(ai)) {
+				let card = partie.getHand(data.id, ai)[0];
+				partie.addCard(data.id, ai, card);
+				AICards[ai] = card;
+			}
+		}
 		// On transmet la carte au autres joueurs
 		for (const player of partieVautour.getPlayersList(data.id)) {
-			if (clients[player] != undefined && player != currentID) {
-				clients[player].emit('vautour-choix-carte-autre-joueur', {
-					from: data.from,
-					value: data.value,
-				});
+			if (clients[player] != undefined && !AI.has(player)) {
+				if (player != currentID) {
+					clients[player].emit('vautour-choix-carte-autre-joueur', {
+						from: data.from,
+						value: data.value,
+					});
+				}
+				// On transmets les cartes des IA au autres joueurs
+				setTimeout(() => {
+					for (let ai of AI) {
+						clients[player].emit('vautour-choix-carte-autre-joueur', {
+							from: ai,
+							value: AICards[ai],
+						});
+					}
+				}, 750);
 			}
 		}
 
-		// Chaque joueur choisi une carte
+		// Chaque joueur non IA a choisi une carte
 		if (
 			partie.getCardPlayedNb(data.id) === partie.getPlayersList(data.id).length
 		) {
@@ -259,23 +279,27 @@ io.on('connection', function (socket) {
 			const pile = partieVautour.getTopPile(data.id);
 			const players = partie.getPlayersList(data.id);
 			for (let player of players) {
-				clients[player].emit('vautour-nouveau-tour', {
-					hote: partieVautour.getHost(data.id),
-					hand: partieVautour.getHand(data.id, player),
-					pile: pile,
-					turn: partieVautour.getNumTurn(data.id),
-					scores: partieVautour.getScores(data.id),
-					winner: winner,
-				});
+				if (clients[player] != undefined && !AI.has(player)) {
+					clients[player].emit('vautour-nouveau-tour', {
+						hote: partieVautour.getHost(data.id),
+						hand: partieVautour.getHand(data.id, player),
+						pile: pile,
+						turn: partieVautour.getNumTurn(data.id),
+						scores: partieVautour.getScores(data.id),
+						winner: winner,
+					});
+				}
 			}
 
 			if (partie.getNumTurn(data.id) === partie.FINAL_TURN + 1) {
 				const gameWinner = partie.endGame(data.id);
 				for (let player of players) {
-					clients[player].emit('vautour-fin-partie', {
-						id: data.id,
-						winner: gameWinner,
-					});
+					if (clients[player] != undefined && !AI.has(player)) {
+						clients[player].emit('vautour-fin-partie', {
+							id: data.id,
+							winner: gameWinner,
+						});
+					}
 				}
 
 				return;
@@ -299,7 +323,10 @@ io.on('connection', function (socket) {
 	 * Envoyer les informations disponible sur une partie précise
 	 */
 	socket.on('vautour-infos', data => {
-		if (clients[data.from] != undefined) {
+		if (
+			clients[data.from] != undefined &&
+			!partieVautour.getAI(data.id).has(data.from)
+		) {
 			clients[data.from].emit('vautour-infos', {
 				id: data.id,
 				isLaunched: partieVautour.isLaunched(data.id),

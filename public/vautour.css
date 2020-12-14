@@ -803,7 +803,7 @@ button#syntheseBtn {
 	animation: slide-card 1s;
 	position: relative;
 	transform-style: preserve-3d;
-	transition: 1s 0.2s;
+	transition: 2s 0.2s;
 	margin-left: 5%;
 	margin-right: 5%;
 	transform: rotateY(0deg) translateX(-50%);

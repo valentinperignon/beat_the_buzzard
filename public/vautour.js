@@ -705,6 +705,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Créer une carte de la main du joueur
 	 */
 	function creerCarteMainJoueur(value) {
+		if (partieActuelle == null) {
+			return;
+		}
 		const nouvelleCarte = document.createElement('span');
 		nouvelleCarte.innerHTML = `<div><span>${value}</span></div>`;
 		nouvelleCarte.setAttribute('value', value);
@@ -734,19 +737,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		// On remonte le dom jusqu'à trouver l'élément de base de la carte
 		let target = e.target;
-		while (!target.classList.contains('carte-main')) {
-			target = target.parentElement;
+		if (target != null) {
+			while (!target.classList.contains('carte-main')) {
+				target = target.parentElement;
+			}
+			target.removeEventListener('mouseleave', eventMouseleaveCarte);
+			target.style = 'transition: 2s;';
+			let selectedCards = document.getElementsByClassName('selected-card');
+			for (let elem of selectedCards) {
+				elem.classList.remove('selected-card');
+			}
+			target.classList.add('selected-card');
+			target.classList.remove('carte-main');
+			target.style.left = '30%';
+			toggleEventCarte(false);
+			retournerPioche(
+				document.getElementsByClassName('pioche-cachee')[0],
+				true
+			);
 		}
-		target.removeEventListener('mouseleave', eventMouseleaveCarte);
-		target.style = 'transition: 2s;';
-		let selectedCards = document.getElementsByClassName('selected-card');
-		for (let elem of selectedCards) {
-			elem.classList.remove('selected-card');
-		}
-		target.classList.add('selected-card');
-		target.classList.remove('carte-main');
-		target.style.left = '30%';
-		toggleEventCarte(false);
 	}
 
 	/**
@@ -918,7 +927,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			for (let player in scores) {
 				htmlstr += `<p id="score-${player}">${player} : ${scores[player]}</p>`;
 			}
-			htmlstr += `</div><div id="pioche-div"><div class="pioche"><div><p>?</p></div></div>`;
+			htmlstr += '</div>';
+			if (data.turn < 15) {
+				htmlstr += `<div id="pioche-div"><div class="pioche"><div><p>?</p></div></div>`;
+			}
 			for (let card of data.pile) {
 				htmlstr += `<div class="pioche-cachee" id="${card}"><div><p>?</p></div></div>`;
 			}
