@@ -18,31 +18,61 @@
 		<input type="radio" name="btnScreen" id="radio1" checked />
 		<div id="logScreen">
 			<div id="connexion">
-				<p>
-					Choisissez votre pseudo : <br />
-					<input
-						type="text"
-						id="pseudo"
-						placeholder="Tapez ici votre pseudo"
-						size="30"
-					/>
-					<input type="button" value="Se connecter" id="btnConnecter" />
-				</p>
+				<h1>Se connecter</h1>
+				<input type="text" id="pseudo" placeholder="Votre pseudo" size="30" />
+				<input type="button" value="C'est parti" id="btnConnecter" />
 			</div>
 		</div>
 
 		<!-- Chat -->
 		<input type="radio" name="btnScreen" id="radio2" />
 		<div id="content">
-			<h2>Chat des L3 - <span id="login"></span></h2>
-			<h3>Clients connectés</h3>
-			<aside></aside>
-			<main></main>
-			<footer>
-				<input type="text" id="monMessage" />
-				<input type="button" value="Envoyer" id="btnEnvoyer" />
-				<input type="button" value="Quitter" id="btnQuitter" />
-			</footer>
+			<aside>
+				<h2>Connectés</h2>
+				<ul></ul>
+			</aside>
+			<main>
+				<div id="messages"></div>
+				<footer>
+					<input
+						type="text"
+						id="monMessage"
+						placeholder="Envoyer un message..."
+					/>
+					<button id="btnEnvoyer">
+						<svg
+							width="15"
+							height="15"
+							viewBox="0 0 15 15"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M1.20307 1.04312C1.00481 0.954998 0.77234 1.0048 0.627577 1.16641C0.482813 1.32802 0.458794 1.56455 0.568116 1.75196L3.92115 7.50002L0.568116 13.2481C0.458794 13.4355 0.482813 13.672 0.627577 13.8336C0.77234 13.9952 1.00481 14.045 1.20307 13.9569L14.7031 7.95692C14.8836 7.87667 15 7.69761 15 7.50002C15 7.30242 14.8836 7.12336 14.7031 7.04311L1.20307 1.04312ZM4.84552 7.10002L2.21234 2.586L13.2689 7.50002L2.21234 12.414L4.84552 7.90002H9C9.22091 7.90002 9.4 7.72094 9.4 7.50002C9.4 7.27911 9.22091 7.10002 9 7.10002H4.84552Z"
+								fill="currentColor"
+								fill-rule="evenodd"
+								clip-rule="evenodd"
+							></path>
+						</svg>
+					</button>
+					<button id="btnQuitter">
+						<svg
+							width="15"
+							height="15"
+							viewBox="0 0 15 15"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M3 1C2.44771 1 2 1.44772 2 2V13C2 13.5523 2.44772 14 3 14H10.5C10.7761 14 11 13.7761 11 13.5C11 13.2239 10.7761 13 10.5 13H3V2L10.5 2C10.7761 2 11 1.77614 11 1.5C11 1.22386 10.7761 1 10.5 1H3ZM12.6036 4.89645C12.4083 4.70118 12.0917 4.70118 11.8964 4.89645C11.7012 5.09171 11.7012 5.40829 11.8964 5.60355L13.2929 7H6.5C6.22386 7 6 7.22386 6 7.5C6 7.77614 6.22386 8 6.5 8H13.2929L11.8964 9.39645C11.7012 9.59171 11.7012 9.90829 11.8964 10.1036C12.0917 10.2988 12.4083 10.2988 12.6036 10.1036L14.8536 7.85355C15.0488 7.65829 15.0488 7.34171 14.8536 7.14645L12.6036 4.89645Z"
+								fill="currentColor"
+								fill-rule="evenodd"
+								clip-rule="evenodd"
+							></path>
+						</svg>
+					</button>
+				</footer>
+			</main>
 		</div>
 
 		<!-- Game -->
@@ -67,7 +97,23 @@
 		</div>
 
 		<!-- Synthèse vocale -->
-		<button id="syntheseBtn">Synthèse vocale</button>
+		<button id="syntheseBtn">
+			<svg
+				width="15"
+				height="15"
+				viewBox="0 0 15 15"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					d="M8 1.5C8 1.31062 7.893 1.13749 7.72361 1.05279C7.55421 0.968093 7.35151 0.986371 7.2 1.1L3.33333 4H1.5C0.671573 4 0 4.67158 0 5.5V9.5C0 10.3284 0.671573 11 1.5 11H3.33333L7.2 13.9C7.35151 14.0136 7.55421 14.0319 7.72361 13.9472C7.893 13.8625 8 13.6894 8 13.5V1.5ZM3.8 4.9L7 2.5V12.5L3.8 10.1C3.71345 10.0351 3.60819 10 3.5 10H1.5C1.22386 10 1 9.77614 1 9.5V5.5C1 5.22386 1.22386 5 1.5 5H3.5C3.60819 5 3.71345 4.96491 3.8 4.9ZM10.833 3.95949C10.7106 3.77557 10.4623 3.72567 10.2784 3.84804C10.0944 3.97041 10.0445 4.21871 10.1669 4.40264C11.4111 6.27268 11.4111 8.72728 10.1669 10.5973C10.0445 10.7813 10.0944 11.0296 10.2784 11.1519C10.4623 11.2743 10.7106 11.2244 10.833 11.0405C12.2558 8.90199 12.2558 6.09798 10.833 3.95949Z"
+					fill="currentColor"
+					fill-rule="evenodd"
+					clip-rule="evenodd"
+				></path>
+			</svg>
+			Synthèse vocale
+		</button>
 		<div id="syntheseParam">
 			<label for="mute">Activer la synthèse vocale</label>
 			<input type="checkbox" name="mute" id="mute" value="mute" />

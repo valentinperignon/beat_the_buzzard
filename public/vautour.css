@@ -1,4 +1,6 @@
-/* -------------------- Reset CSS -------------------- */
+/***********************************************
+------------------- Reset CSS ------------------
+************************************************/
 
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
@@ -130,9 +132,27 @@ table {
 	border-spacing: 0;
 }
 
-/* -------------------- Général -------------------- */
+/***********************************************
+-------------------- Général ------------------- 
+************************************************/
 
-:root {
+html {
+	--color-background: #fefbea;
+	--color-background2: white;
+
+	--color-orange0: rgba(254, 182, 58, 0.5);
+	--color-orange1: #ffa834;
+	--color-orange2: #fd8e34;
+
+	--color-gray: rgb(242, 242, 247);
+	--color-gray2: rgb(142, 142, 147);
+
+	--color-main: black;
+	--color-second: white;
+
+	--radius-main: 8px;
+	--radius: 6px;
+
 	--player1-color: rgb(45, 141, 252);
 	--player2-color: rgb(255, 36, 47);
 	--player3-color: rgb(82, 211, 82);
@@ -140,229 +160,243 @@ table {
 	--player5-color: rgb(221, 42, 191);
 }
 
+html[data-theme='dark'] {
+	--color-background: #011528;
+}
+
 body {
 	font-family: sans-serif;
+	background-color: var(--color-background);
 }
 
 * {
 	box-sizing: border-box;
 }
 
-body > div {
-	box-shadow: -10px 10px 20px #a0a0a0;
-	border: solid 1px #a0a0a0;
-}
-
-div {
-	padding: 10px;
-}
-
-/* -------------------- LogScreen -------------------- */
-
 body > div,
 body > input[type='radio'] {
 	display: none;
 }
 
-input[type='radio']:checked + div {
+/***********************************************
+-------------------- Input ---------------------
+************************************************/
+
+input[type='text'] {
+	background-color: var(--color-gray);
 	display: block;
+	padding: 1.2rem 0.9rem;
+	border: none;
+	border-radius: var(--radius);
+	font-size: 1rem;
+}
+
+input[type='text']:focus {
+	outline: none;
+}
+
+/***********************************************
+------------------- logScren -------------------
+************************************************/
+
+input[type='radio']:checked + #logScreen {
+	display: flex;
 }
 
 #logScreen {
-	background: rgba(200, 200, 200, 1);
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100vw;
+	display: none;
 	height: 100vh;
-	z-index: 10;
+	justify-content: center;
+	align-items: center;
 }
+
 #logScreen > div {
 	text-align: center;
-	width: 300px;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	background-color: white;
-	transform: translate(-50%, -50%);
-	-webkit-transform: translate(-50%, -50%);
-	-ms-transform: translate(-50%, -50%);
-	border: solid 2px #000;
-	border-radius: 10px;
-	box-shadow: 10px 10px 10px #000;
-	padding-top: 20px;
-}
-#logScreen input {
-	padding: 3px;
-	font-size: 80%;
-	margin: 10px;
-}
-#logScreen #pseudo {
-	width: 80%;
+	background-color: var(--color-background2);
+	border-radius: var(--radius-main);
+	padding: 3rem 2.5rem;
+	box-shadow: 0 0 13px 2px rgba(0, 0, 0, 0.2);
 }
 
-/* -------------------- Chat -------------------- */
+#logScreen > div > h1 {
+	font-size: 1.1rem;
+	text-transform: uppercase;
+	font-weight: bold;
+	margin-bottom: 1.8rem;
+}
+
+#logScreen > div > input[type='text'] {
+	margin-bottom: 1.7rem;
+}
+
+#logScreen > div > input[type='button'] {
+	background-color: var(--color-orange1);
+	padding: 1rem 2.5rem;
+	text-transform: uppercase;
+	border: none;
+	border-radius: var(--radius);
+	box-shadow: 0 0 13px 2px var(--color-orange0);
+	color: white;
+	font-size: 0.9rem;
+	transition: background-color 0.2s ease-in-out;
+}
+
+#logScreen > div > input[type='button']:hover {
+	background-color: var(--color-orange2);
+}
+
+@media only screen and (max-width: 450px) {
+	#logScreen > div {
+		border-radius: 0;
+		padding-left: 0;
+		padding-right: 0;
+		width: 100%;
+	}
+
+	#logScreen > div > input[type='text'] {
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
+
+/***********************************************
+--------------------- Chat ---------------------
+************************************************/
+
+input[type='radio']:checked + #content {
+	display: flex;
+}
 
 #content {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	-webkit-transform: translate(-50%, -50%);
-	-ms-transform: translate(-50%, -50%);
-	height: 500px;
-	width: 700px;
-	background-color: beige;
-	padding: 10px;
-}
-
-#content h2,
-#content h3 {
-	position: absolute;
-	background-color: inherit;
-	height: 22px;
-	padding: 5px;
-	line-height: 16px;
-	font-size: 16px;
-	font-weight: bold;
-	border-radius: 5px 5px 0 0;
-	border-top: inherit;
-	border-left: inherit;
-	border-right: inherit;
-}
-
-#content h2 {
-	top: -22px;
-	left: -1px;
-}
-
-#content h3 {
-	right: -11px;
-	top: -12px;
-	transform-origin: left center;
-	transform: translate(100%) rotate(90deg);
+	display: none;
+	height: 100vh;
+	width: 100vw;
+	border: 1.5em solid var(--color-background);
 }
 
 #content main {
-	position: relative;
-	height: calc(100% - 30px);
-	width: calc(100% - 170px);
-	background-color: white;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	background: var(--color-background2);
+	border-top-right-radius: var(--radius-main);
+	border-bottom-right-radius: var(--radius-main);
+}
+
+#content main #messages {
+	padding: 2em;
+	flex-grow: 1;
 	overflow-y: scroll;
-	line-height: 1.2;
 }
 
-#content main p {
-	line-height: 1;
-	font-size: 16px;
-	margin: 3px;
+#content main .msg {
+	margin-bottom: 1rem;
 }
 
-#content main .mp,
+#content main .msg h3 {
+	font-weight: bold;
+	margin-bottom: 0.5rem;
+}
+
+#content main .msg h3 span {
+	font-weight: normal;
+	color: var(--color-gray2);
+	font-size: 0.8rem;
+	margin-left: 0.1rem;
+}
+
+#content main .msg p {
+	display: inline-block;
+	font-size: 1rem;
+	max-width: 70%;
+	padding: 1rem;
+	border-radius: 20px;
+	background-color: var(--color-gray);
+}
+
+#content main .msg.moi {
+	text-align: right;
+}
+
+#content main .msg.moi p {
+	background-color: var(--color-orange0);
+}
+
+#content main .msg.system {
+	text-align: center;
+}
+
+#content main .msg.system p {
+	padding: 0;
+	background: none;
+}
+
 #game aside #messages .mp {
 	color: darkblue;
 }
 
-#content main .moi,
 #game aside #messages .moi {
 	color: green;
 }
 
-#content main .system,
 #game aside #messages .system {
 	color: orange;
 }
 
-#content main .chifoumi {
-	color: blueviolet;
+#content main footer {
+	display: flex;
+	padding: 1rem;
+	position: relative;
 }
 
-#content main img {
-	max-width: 50%;
-	vertical-align: text-top;
+#content main footer input[type='text'] {
+	flex-grow: 1;
+	margin-right: 1rem;
 }
 
-/** Pied de zone de chat */
-#content footer {
-	position: absolute;
-	bottom: 0;
-	padding: 2px 0 6px 0;
-	width: calc(100% - 20px);
-	background-color: inherit;
+#content main footer button {
+	background: none;
+	border: none;
 }
 
-#content footer input {
-	font-size: 15px;
+#content main footer button:first-of-type {
+	margin-right: 0.6rem;
+	transition: color 0.2s ease-in-out;
 }
 
-#content > footer input:first-child {
-	width: calc(100% - 180px);
-	font-size: 12px;
+#content main footer button:first-of-type:hover {
+	color: var(--color-orange2);
 }
 
-#content > footer input:last-child {
-	float: right;
+#content main footer button:last-child {
+	color: red;
 }
 
 #content aside {
-	width: 160px;
-	float: right;
-	margin: 0px;
-	padding: 5px;
-	height: calc(100% - 30px);
-	background-color: white;
-	line-height: 1.2;
-	font-size: 14px;
+	width: 20%;
+	background-color: #2b2b2b;
+	color: white;
+	padding: 2em;
+	border-top-left-radius: var(--radius-main);
+	border-bottom-left-radius: var(--radius-main);
+	flex-shrink: 0;
 }
 
-#content aside p {
+#content aside h2 {
+	text-transform: uppercase;
+	font-weight: bold;
+	font-size: 1.1rem;
+	margin-bottom: 1rem;
+}
+
+#content aside ul li {
 	cursor: pointer;
-	margin: 0;
-	padding: 0;
+	font-size: 1rem;
+	margin-bottom: 0.2rem;
 }
 
-#content aside p[data-score]:after {
-	content: ' [' attr(data-score) ' pts]';
-	float: right;
-}
-
-#content aside p[data-score]:nth-child(1):before {
-	content: '\01F947';
-}
-
-#content aside p[data-score]:nth-child(2):before {
-	content: '\01F948';
-}
-
-#content aside p[data-score]:nth-child(3):before {
-	content: '\01F949';
-}
-
-/** Animation BUZZ **/
-.buzz {
-	animation-name: buzz;
-	animation-duration: 0.1s;
-	animation-direction: normal;
-	animation-fill-mode: forwards;
-	animation-iteration-count: 5;
-}
-@keyframes buzz {
-	0% {
-		transform: translate(-50%, -50%);
-	}
-	25% {
-		transform: translate(-55%, -50%);
-	}
-	75% {
-		transform: translate(-45%, -50%);
-	}
-	100% {
-		transform: translate(-50%, -50%);
-	}
-}
-
-/*********************************************** 
---------------------- Game --------------------- 
+/***********************************************
+--------------------- Game ---------------------
 ************************************************/
 
 input[type='radio']:checked + #game {
@@ -495,6 +529,7 @@ input[type='radio']:checked + #game {
 	text-align: left;
 	width: 82%;
 	min-width: 30%;
+	display: inline-block;
 }
 
 #game aside #labEnvoyer {
@@ -535,12 +570,13 @@ input[type='radio']:checked + #game {
 	margin: 1rem;
 	cursor: pointer;
 	word-break: break-all;
+	line-height: 95px;
 }
 
 #game main #liste-invitations #carte-hote::before {
 	content: '👑';
 	position: absolute;
-	top: 2%;
+	top: -50px;
 	font-size: Larger;
 }
 
