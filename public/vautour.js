@@ -39,8 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		radio: document.getElementById('radio2'),
 		content: document.getElementById('content'),
 		username: document.getElementById('login'),
-		messages: document.querySelector('main'),
-		users: document.querySelector('aside'),
+		messages: document.querySelector('main > #messages'),
+		users: document.querySelector('aside ul'),
 		input: document.getElementById('monMessage'),
 		btnSend: document.getElementById('btnEnvoyer'),
 		btnLeft: document.getElementById('btnQuitter'),
@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// synthèse vocale
 	let syntheseVocale = null;
+	initSynthese();
 
 	/* -------------------- Réception des messages du serveur -------------------- */
 
@@ -76,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	sock.on('bienvenue', liste => {
 		if (utilisateurActuel) {
 			const { btn: btnConnecter } = UIConnexion;
-			const { radio, username, messages, input } = UIChat;
+			const { radio, messages, input } = UIChat;
 
 			// on change l'affichage du bouton
 			btnConnecter.value = 'Se connecter';
@@ -84,7 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			// on vide les zones de saisie
 			messages.innerHTML = '';
 			input.value = '';
-			username.innerHTML = utilisateurActuel;
 			radio.checked = true;
 			input.focus();
 
@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	sock.on('disconnect', () => {
 		nettoyer();
 		UIConnexion.radio.checked = true;
-		UIChat.username.focus();
+		UIConnexion.input.focus();
 	});
 
 	/**
@@ -405,9 +405,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		} else if (msg.from == null) {
 			classe = 'system';
 			msg.from = '[admin]';
-		} else if (msg.from === 0) {
-			classe = 'chifoumi';
-			msg.from = '[chifoumi]';
 		}
 
 		// affichage de la date format ISO pour avoir les HH:MM:SS
@@ -418,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		// remplacement des caractères spéciaux par des émoji
 		msg.text = traiterTexte(msg.text);
 		// création et affichage du message
-		const message = `<div class="${classe}"><p><b>${date} - ${msg.from} :</b> ${msg.text}</p></div>`;
+		const message = `<div class="msg ${classe}"><h3>${msg.from} <span>${date}</span></h3><p>${msg.text}</p></div>`;
 		UIChat.messages.innerHTML += message;
 		UIGame.chat.messages.innerHTML += message;
 		if (UIChat.radio.checked) {
@@ -436,12 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	/**
-	 * Lire un message avec la synthèse vocale
-	 * @param string Texte à prononcer
-	 */
-	function parler(text) {
-		// Initialiser la synthèse vocale
+	function initSynthese() {
 		if (syntheseVocale === null) {
 			syntheseVocale = JSON.parse(
 				localStorage.getItem(`voice_${utilisateurActuel}`)
@@ -453,7 +445,13 @@ document.addEventListener('DOMContentLoaded', () => {
 				};
 			}
 		}
+	}
 
+	/**
+	 * Lire un message avec la synthèse vocale
+	 * @param string Texte à prononcer
+	 */
+	function parler(text) {
 		if (!syntheseVocale.active || typeof speechSynthesis === 'undefined') {
 			return;
 		}
@@ -486,7 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function afficherListe(nouvelleListe) {
 		listeUtilisateurs = Object.keys(nouvelleListe);
 		UIChat.users.innerHTML = listeUtilisateurs
-			.map(u => `<p data-score="${nouvelleListe[u]}">${u}</p>`)
+			.map(u => `<li>${u}</li>`)
 			.join('');
 	}
 
