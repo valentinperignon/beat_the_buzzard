@@ -180,9 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
 					}
 				} else {
 					partiesStupideVautour[partieActuelle].delete(data.from);
-					document
-						.getElementById('cartes-autres')
-						.removeChild(document.getElementById(data.from));
 					if (!document.getElementById('carte-ajout-joueur')) {
 						creerCarteAjouterJoueur();
 					}
@@ -770,6 +767,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function creerBtnLancerPartie(id) {
 		// bouton pour lancer la partie
+		if (document.getElementById('jouerBtn')) {
+			return;
+		}
 		const jouerBouton = document.createElement('btn');
 		jouerBouton.innerText = 'Lancer la partie';
 		jouerBouton.setAttribute('id', 'jouerBtn');
