@@ -148,7 +148,6 @@ html {
 	--color-gray2: rgb(142, 142, 147);
 
 	--color-main: black;
-	--color-second: white;
 
 	--radius-main: 8px;
 	--radius: 6px;
@@ -161,7 +160,16 @@ html {
 }
 
 html[data-theme='dark'] {
-	--color-background: #011528;
+	--color-background: #181a27;
+	--color-background2: #15151d;
+
+	--color-orange0: #f08831;
+	--color-orange1: #fd8e34;
+	--color-orange2: #ffa834;
+
+	--color-gray: rgb(44, 44, 46);
+
+	--color-main: white;
 }
 
 body {
@@ -189,6 +197,7 @@ input[type='text'] {
 	border: none;
 	border-radius: var(--radius);
 	font-size: 1rem;
+	color: var(--color-main);
 }
 
 input[type='text']:focus {
@@ -218,11 +227,16 @@ input[type='radio']:checked + #logScreen {
 	box-shadow: 0 0 13px 2px rgba(0, 0, 0, 0.2);
 }
 
+html[data-theme='dark'] #logScreen > div {
+	box-shadow: none;
+}
+
 #logScreen > div > h1 {
 	font-size: 1.1rem;
 	text-transform: uppercase;
 	font-weight: bold;
 	margin-bottom: 1.8rem;
+	color: var(--color-main);
 }
 
 #logScreen > div > input[type='text'] {
@@ -239,6 +253,10 @@ input[type='radio']:checked + #logScreen {
 	color: white;
 	font-size: 0.9rem;
 	transition: background-color 0.2s ease-in-out;
+}
+
+html[data-theme='dark'] #logScreen > div > input[type='button'] {
+	box-shadow: 0 0 6px 2px var(--color-orange0);
 }
 
 #logScreen > div > input[type='button']:hover {
@@ -296,6 +314,7 @@ input[type='radio']:checked + #content {
 #content main .msg h3 {
 	font-weight: bold;
 	margin-bottom: 0.5rem;
+	color: var(--color-main);
 }
 
 #content main .msg h3 span {
@@ -312,6 +331,7 @@ input[type='radio']:checked + #content {
 	padding: 1rem;
 	border-radius: 20px;
 	background-color: var(--color-gray);
+	color: var(--color-main);
 }
 
 #content main .msg.moi {
@@ -362,6 +382,7 @@ input[type='radio']:checked + #content {
 #content main footer button:first-of-type {
 	margin-right: 0.6rem;
 	transition: color 0.2s ease-in-out;
+	color: var(--color-main);
 }
 
 #content main footer button:first-of-type:hover {

@@ -59,6 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	let partieActuelle = -1;
 	const partiesStupideVautour = {}; // {id -> { utilisateurs }...}
 
+	// darkmode
+	let keyPressed = [];
+
 	// éléments de l'interface de connexion
 	const UIConnexion = {
 		radio: document.getElementById('radio1'),
@@ -1168,6 +1171,27 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	// --> keydown
+
+	document.addEventListener('keydown', e => {
+		if (e.key === 'Control' || e.key === 'd') {
+			keyPressed.push(e.key);
+		}
+
+		if (keyPressed.length == 2) {
+			if (
+				!document.documentElement.dataset['theme'] ||
+				document.documentElement.dataset['theme'] != 'dark'
+			) {
+				document.documentElement.dataset['theme'] = 'dark';
+			} else {
+				document.documentElement.dataset['theme'] = 'light';
+			}
+		}
+	});
+
+	document.addEventListener('keyup', () => {
+		keyPressed = [];
+	});
 
 	UIConnexion.input.addEventListener('keydown', e => {
 		if (e.key === 'Enter')
