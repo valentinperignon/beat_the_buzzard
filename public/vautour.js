@@ -25,6 +25,36 @@ document.addEventListener('DOMContentLoaded', () => {
 		':mask:': '&#128567;',
 	};
 
+	// Messages d'encouragement au joueur
+	const encouragerLeJoueur = {
+		carteVautour: [
+			'Nul. Nul. Nul... Et ? Nul.',
+			"T'as compris que tu ne dois pas obtenir les cartes vautours ?",
+			"Encore des points en moins ? T'as de la chance, je sais coder la valeur moins infinie.",
+			"Sur ce coup la, tu peux t'en prendre qu'à toi même, t'es juste mauvais",
+			"Tu m'appelles quand tu arrêtes de perdres des points s'il te plait ?",
+			'Pour attirer tous ces vautours, tu dois vraiment être une belle charogne.',
+			'Si tu continues comme ça, tu vas finir dans le caniveau.',
+			'Bon... mets tes cartes au hasard, vu ton niveau ça vaudra mieux.',
+			"J'ai rarement vu quelqu'un d'aussi mauvais à ce jeu.",
+			"Ca doit pas être facile tous les jours d'être comme toi",
+			'Je me demande qui est le plus stupide, ce vautour ou toi ?',
+			'Et après on se demande pourquoi vous avez peur de vous faire dépasser par les iha',
+		],
+		aucuneCarte: [
+			'Bonne nouvelle : tu ne perds aucun point. Mauvaise nouvelle: tu ne gagnes aucun point non plus.',
+			'Il va falloir penser à gagner des points',
+			"Perdu, t'es vraiment éclaté",
+			'Il faut pas mettre tes cartes au hasard tu sais',
+			'Je pensais que tu allais la gagner celle-la',
+			'On est pas au uno ici, il faut gagner les cartes.',
+			"C'est gentil d'aider les autres joueurs à gagner.",
+			'Espèce de petit joueur.',
+			"Tu aurais mieux fait de travailler tes TP de scheme plutôt que de t'entrainer à ce jeu.",
+			"Tu l'auras la prochaine fois. Non je rigole t'es trop nul pour ça",
+		],
+	};
+
 	// parties de stupide vautour
 	let partieActuelle = -1;
 	const partiesStupideVautour = {}; // {id -> { utilisateurs }...}
@@ -138,6 +168,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	sock.on('vautour-invitation', data => {
 		switch (data.type) {
 			case 'ask':
+				// Set a timer
+				setTimeout(() => {
+					if (document.getElementById('popup')) {
+						document.getElementById('popup').remove();
+						sock.emit('vautour-afk', { id: data.id, from: utilisateurActuel });
+					}
+				}, 15000);
+
+				parler(`${data.from} t'as invité à jouer à stupide vautour.`);
+
 				// affichage d'une popup
 				const popup = document.createElement('div');
 				document.body.appendChild(popup);
@@ -226,6 +266,17 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	sock.on('vautour-choix-carte-autre-joueur', data => {
+		parler(`${data.from} a joué ${data.value}`);
+		// Petit conseils
+		if (data.value > 13) {
+			if (Math.random < 0.4) {
+				parler('Tu ferais mieux de te couché la');
+			}
+		} else if (data.value < 5) {
+			if (Math.random < 0.4) {
+				parler("C'est le moment, passes à l'attaque !");
+			}
+		}
 		creerCarteAutreJoueur(data.value, data.from);
 	});
 
@@ -241,13 +292,22 @@ document.addEventListener('DOMContentLoaded', () => {
 	 */
 	sock.on('vautour-fin-partie', data => {
 		if (!data.winner) {
+			parler("Fin de la partie ! Personne n'a gagné...");
 			alert("Fin de la partie ! Personne n'a gagné...");
 			return;
 		}
 
 		if (data.winner === utilisateurActuel) {
 			alert('Bravo ! Vous avez gagné cette partie.');
+			parler("Mouais... pas si mal, t'as réussi à gagner finalement.");
 		} else {
+			if (Math.random() < 0.2) {
+				parler(
+					`Bravo ! Non je déconne c'est ${data.winner} qui a gagné. T'as été nul toute la partie`
+				);
+			} else {
+				parler(`C'est perdu... ${data.winner} gagne la partie.`);
+			}
 			alert(`C'est perdu... ${data.winner} gagne la partie.`);
 		}
 	});
@@ -659,7 +719,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		carteAutreJoueur.id = `J${numJoueur}`;
 		// Mode admin (triche autorisée)
 		if (utilisateurActuel.match(/^(fred|Fred)$/)) {
-			console.log('ADMIN MOD');
 			carteAutreJoueur.addEventListener('click', retournerCarte);
 		}
 		document
@@ -681,22 +740,27 @@ document.addEventListener('DOMContentLoaded', () => {
 				setTimeout(() => {
 					target.classList.remove(`face-cachee`);
 					target.classList.add(`face-visible`);
-				}, 500);
+				}, 700);
 			}
 		}
 	}
 
+	/**
+	 *  Retourner la pioche
+	 */
 	function retournerPioche() {
 		let target = document.getElementsByClassName('pioche-cachee')[0];
-		target.style = 'transform:rotateY(-180deg) translateX(-120%);';
-		setTimeout(() => {
-			target.classList.remove(`pioche-cachee`);
-			target.classList.add(`pioche-visible`);
-			target.innerHTML = `<div><span>${target.id}</span></div>`;
-		}, 750);
-		setTimeout(() => {
-			target.classList.add(`top-pioche`);
-		}, 2000);
+		if (target != null) {
+			target.style = 'transform:rotateY(-180deg) translateX(-120%);';
+			setTimeout(() => {
+				target.classList.remove(`pioche-cachee`);
+				target.classList.add(`pioche-visible`);
+				target.innerHTML = `<div><span>${target.id}</span></div>`;
+			}, 750);
+			setTimeout(() => {
+				target.classList.add(`top-pioche`);
+			}, 2000);
+		}
 	}
 
 	/**
@@ -951,26 +1015,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	async function finDuTour(data) {
-		const encouragerLeJoueur = {
-			carteVautour: [
-				'Nul. Nul. Nul... Et ? Nul.',
-				"T'as compris que tu ne dois pas obtenir les cartes vautours ?",
-				"Encore des points en moins ? T'as de la chance, je sais coder la valeur moins infinie.",
-				'Pour attirer tous ces vautours, tu dois vraiment être une belle charogne.',
-				'Si tu continues comme ça, tu vas finir dans le caniveau.',
-				"J'ai rarement vu quelqu'un d'aussi mauvais à ce jeu.",
-				'Je me demande qui est le plus stupide, ce vautour ou toi ?',
-			],
-			aucuneCarte: [
-				'Bonne nouvelle : tu ne perds aucun point. Mauvaise nouvelle: tu ne gagnes aucun point non plus.',
-				'On est pas au uno ici, il faut gagner les cartes.',
-				"C'est gentil d'aider les autres joueurs à gagner.",
-				'Espèce de petit joueur.',
-				"Tu aurais mieux fait de travailler tes TP de scheme plutôt que de t'entrainer à ce jeu.",
-				"Tu l'auras la prochaine fois. Non je rigole t'es trop nul pour ça",
-			],
-		};
-
 		await sleep(2000);
 		retournerCarte();
 		await sleep(2000);
@@ -979,7 +1023,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		);
 		if (data.winner === utilisateurActuel) {
 			if (carteNumero > 0) {
-				console.log('GAGNé');
 				alert("C'est gagné ! Vous remportez la carte Souris.");
 			} else {
 				alert("C'est perdu ! Vous obtenez la carte Vautour.");
@@ -1004,6 +1047,27 @@ document.addEventListener('DOMContentLoaded', () => {
 		disparitionCartes();
 		await sleep(1200);
 		renderVautour(data, true);
+		// Remercier les personnes lentes à jouer
+		setTimeout(() => {
+			if (!document.getElementsByClassName('selected-card')[0]) {
+				parler('Aller dépêches-toi un peu');
+				setTimeout(() => {
+					if (!document.getElementsByClassName('selected-card')[0]) {
+						parler('On a pas toute la journée');
+						setTimeout(() => {
+							if (!document.getElementsByClassName('selected-card')[0]) {
+								parler("Si tu te décides pas je vais vraiment t'insulter");
+								setTimeout(() => {
+									if (!document.getElementsByClassName('selected-card')[0]) {
+										parler("Bon t'as gagné j'abandonne");
+									}
+								}, 7000);
+							}
+						}, 7000);
+					}
+				}, 6000);
+			}
+		}, 30000);
 	}
 
 	function disparitionCartes() {
