@@ -184,6 +184,14 @@ io.on('connection', function (socket) {
 	});
 
 	/**
+	 * Gère un utilisateur afk
+	 */
+	socket.on('vautour-afk', data => {
+		partieVautour.removeInvite(data.id, data.from);
+		envoyerListeVautour(data.id, data.from);
+	});
+
+	/**
 	 * Création d'une partie de Stupide Vautour
 	 */
 	socket.on('vautour-creer', from => {
