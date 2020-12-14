@@ -240,6 +240,16 @@ io.on('connection', function (socket) {
 			return;
 		}
 
+		// On transmet la carte au autres joueurs
+		for (const player of partieVautour.getPlayersList(data.id)) {
+			if (clients[player] != undefined && player != currentID) {
+				clients[player].emit('vautour-choix-carte-autre-joueur', {
+					from: data.from,
+					value: data.value,
+				});
+			}
+		}
+
 		// Chaque joueur choisi une carte
 		if (
 			partie.getCardPlayedNb(data.id) === partie.getPlayersList(data.id).length

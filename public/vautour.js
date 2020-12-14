@@ -180,9 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
 					}
 				} else {
 					partiesStupideVautour[partieActuelle].delete(data.from);
-					document
-						.getElementById('cartes-autres')
-						.removeChild(document.getElementById(data.from));
 					if (!document.getElementById('carte-ajout-joueur')) {
 						creerCarteAjouterJoueur();
 					}
@@ -228,55 +225,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		renderVautour(data, true);
 	});
 
+	sock.on('vautour-choix-carte-autre-joueur', data => {
+		creerCarteAutreJoueur(data.value, data.from);
+	});
+
 	/**
 	 * Nouveau tour de jeu dans une partie de Stupide Vautour
 	 */
 	sock.on('vautour-nouveau-tour', data => {
-		const encouragerLeJoueur = {
-			carteVautour: [
-				'Nul. Nul. Nul... Et ? Nul.',
-				"T'as compris que tu ne dois pas obtenir les cartes vautours ?",
-				"Encore des points en moins ? T'as de la chance, je sais coder la valeur moins infinie.",
-				'Pour attirer tous ces vautours, tu dois vraiment être une belle charogne.',
-				'Si tu continues comme ça, tu vas finir dans le caniveau.',
-				"J'ai rarement vu quelqu'un d'aussi mauvais à ce jeu.",
-				'Je me demande qui est le plus stupide, ce vautour ou toi ?',
-			],
-			aucuneCarte: [
-				'Bonne nouvelle : tu ne perds aucun point. Mauvaise nouvelle: tu ne gagnes aucun point non plus.',
-				'On est pas au uno ici, il faut gagner les cartes.',
-				"C'est gentil d'aider les autres joueurs à gagner.",
-				'Espèce de petit joueur.',
-				"Tu aurais mieux fait de travailler tes TP de scheme plutôt que de t'entrainer à ce jeu.",
-				"Tu l'auras la prochaine fois. Non je rigole t'es trop nul pour ça",
-			],
-		};
-
-		const carteNumero = Number(document.querySelector('.top-pioche').innerText);
-
-		if (data.winner === utilisateurActuel) {
-			if (carteNumero > 0) {
-				alert("C'est gagné ! Vous remportez la carte Souris.");
-			} else {
-				alert("C'est perdu ! Vous obtenez la carte Vautour.");
-				parler(
-					encouragerLeJoueur.carteVautour[
-						getRandomNumber(encouragerLeJoueur.carteVautour.length)
-					]
-				);
-			}
-		} else {
-			if (carteNumero > 0 && getRandomNumber(5) === 0) {
-				parler(
-					encouragerLeJoueur.aucuneCarte[
-						getRandomNumber(encouragerLeJoueur.aucuneCarte.length)
-					]
-				);
-			}
-		}
-
-		delete data.winner;
-		renderVautour(data, true);
+		finDuTour(data);
 	});
 
 	/**
@@ -710,57 +667,38 @@ document.addEventListener('DOMContentLoaded', () => {
 		document
 			.getElementById('choix-cartes-autres')
 			.appendChild(carteAutreJoueur);
+
+		setTimeout(() => carteAutreJoueur.classList.add('visible'), 200);
 	}
 
 	/**
 	 * Retourne une carte
-	 *
-	 * @param {*} e élément déclanchant l'évènement
-	 * @param {boolean} pioche true s'il faut retourner la pioche, faux sinon
 	 */
-	function retournerCarte(e, pioche = false) {
-		let target = e.target;
-		while (target != null && !target.id.match(/^J[1-5]$/)) {
-			target = target.parentElement;
-		}
-		if (target != null) {
-			target.style = 'transform:rotateY(180deg) translateX(50%);';
-			target = target.children[0];
-			let classe;
-			if (pioche) {
-				classe = 'pioche';
-			} else {
-				classe = 'face';
+	function retournerCarte() {
+		for (let target of document.getElementById('choix-cartes-autres')
+			.children) {
+			if (target != null) {
+				target.style = 'transform:rotateY(180deg) translateX(50%);';
+				target = target.children[0];
+				setTimeout(() => {
+					target.classList.remove(`face-cachee`);
+					target.classList.add(`face-visible`);
+				}, 500);
 			}
-			setTimeout(() => {
-				target.classList.remove(`${classe}-cachee`);
-				target.classList.add(`${classe}-visible`);
-			}, 500);
 		}
 	}
 
-	function retournerPioche(target, pioche = false) {
-		if (target != null) {
-			target.style = 'transform:rotateY(180deg) translateX(-120%);';
-			let classe;
-			if (pioche) {
-				classe = 'pioche';
-			} else {
-				classe = 'face';
-			}
-			setTimeout(() => {
-				target.classList.remove(`${classe}-cachee`);
-				target.classList.add(`${classe}-visible`);
-				if (pioche) {
-					target.innerHTML = `<div><span>${target.id}</span></div>`;
-				}
-			}, 600);
-			if (pioche) {
-				setTimeout(() => {
-					target.classList.add(`top-pioche`);
-				}, 2000);
-			}
-		}
+	function retournerPioche() {
+		let target = document.getElementsByClassName('pioche-cachee')[0];
+		target.style = 'transform:rotateY(-180deg) translateX(-120%);';
+		setTimeout(() => {
+			target.classList.remove(`pioche-cachee`);
+			target.classList.add(`pioche-visible`);
+			target.innerHTML = `<div><span>${target.id}</span></div>`;
+		}, 750);
+		setTimeout(() => {
+			target.classList.add(`top-pioche`);
+		}, 2000);
 	}
 
 	/**
@@ -830,6 +768,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function creerBtnLancerPartie(id) {
 		// bouton pour lancer la partie
+		if (document.getElementById('jouerBtn')) {
+			return;
+		}
 		const jouerBouton = document.createElement('btn');
 		jouerBouton.innerText = 'Lancer la partie';
 		jouerBouton.setAttribute('id', 'jouerBtn');
@@ -978,11 +919,13 @@ document.addEventListener('DOMContentLoaded', () => {
 			for (let player in scores) {
 				htmlstr += `<p id="score-${player}">${player} : ${scores[player]}</p>`;
 			}
-			htmlstr += `</div><div id="pioche-div"><div class="pioche"><div><p>?</p></div></div><div class="pioche-cachee" id="${data.pile}">`;
+			htmlstr += `</div><div id="pioche-div"><div class="pioche"><div><p>?</p></div></div>`;
 			for (let card of data.pile) {
-				htmlstr += `<div><p>?</p></div>`;
+				htmlstr += `<div class="pioche-cachee" id="${card}"><div><p>?</p></div></div>`;
 			}
-			htmlstr += `</div></div>`;
+			htmlstr += `</div>`;
+
+			setTimeout(() => retournerPioche(), 1000);
 
 			UIGame.game.insertAdjacentHTML('afterbegin', htmlstr);
 
@@ -995,14 +938,83 @@ document.addEventListener('DOMContentLoaded', () => {
 				}
 			}
 			UIGame.game.insertAdjacentElement('beforeend', mainJoueur);
-			// FOR TEST AND PIPELINE
-			creerCarteAutreJoueur(1, 'val');
-			creerCarteAutreJoueur(14, 'fred');
+		}
+	}
+
+	async function finDuTour(data) {
+		const encouragerLeJoueur = {
+			carteVautour: [
+				'Nul. Nul. Nul... Et ? Nul.',
+				"T'as compris que tu ne dois pas obtenir les cartes vautours ?",
+				"Encore des points en moins ? T'as de la chance, je sais coder la valeur moins infinie.",
+				'Pour attirer tous ces vautours, tu dois vraiment être une belle charogne.',
+				'Si tu continues comme ça, tu vas finir dans le caniveau.',
+				"J'ai rarement vu quelqu'un d'aussi mauvais à ce jeu.",
+				'Je me demande qui est le plus stupide, ce vautour ou toi ?',
+			],
+			aucuneCarte: [
+				'Bonne nouvelle : tu ne perds aucun point. Mauvaise nouvelle: tu ne gagnes aucun point non plus.',
+				'On est pas au uno ici, il faut gagner les cartes.',
+				"C'est gentil d'aider les autres joueurs à gagner.",
+				'Espèce de petit joueur.',
+				"Tu aurais mieux fait de travailler tes TP de scheme plutôt que de t'entrainer à ce jeu.",
+				"Tu l'auras la prochaine fois. Non je rigole t'es trop nul pour ça",
+			],
+		};
+
+		await sleep(2000);
+		retournerCarte();
+		await sleep(2000);
+		const carteNumero = Number(
+			document.querySelector('.pioche-visible div span').innerText
+		);
+		if (data.winner === utilisateurActuel) {
+			if (carteNumero > 0) {
+				console.log('GAGNé');
+				alert("C'est gagné ! Vous remportez la carte Souris.");
+			} else {
+				alert("C'est perdu ! Vous obtenez la carte Vautour.");
+				parler(
+					encouragerLeJoueur.carteVautour[
+						getRandomNumber(encouragerLeJoueur.carteVautour.length)
+					]
+				);
+			}
+		} else {
+			if (carteNumero > 0 && getRandomNumber(5) === 0) {
+				parler(
+					encouragerLeJoueur.aucuneCarte[
+						getRandomNumber(encouragerLeJoueur.aucuneCarte.length)
+					]
+				);
+			}
+		}
+		delete data.winner;
+		await sleep(1000);
+		// On réaffiche le jeu
+		disparitionCartes();
+		await sleep(1200);
+		renderVautour(data, true);
+	}
+
+	function disparitionCartes() {
+		for (let child of document.getElementById('choix-cartes-autres').children) {
+			child.classList.add('fade-out');
+		}
+		document
+			.getElementsByClassName('selected-card')[0]
+			.classList.add('fade-out');
+		for (let child of document.getElementsByClassName('top-pioche')) {
+			child.classList.add('fade-out');
 		}
 	}
 
 	function getRandomNumber(max, min = 0) {
 		return Math.floor(Math.random() * max) + min;
+	}
+
+	function sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 
 	/* -------------------- Ecouteurs -------------------- */

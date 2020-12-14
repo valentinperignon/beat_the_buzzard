@@ -785,7 +785,22 @@ button#syntheseBtn {
 	width: 50%;
 }
 
+@keyframes slide-card {
+	0% {
+		top: -100%;
+	}
+	100% {
+		z-index: 1;
+		top: 0%;
+	}
+}
+#choix-cartes-autres .visible {
+	z-index: 1;
+}
+
 #choix-cartes-autres > span {
+	z-index: -1;
+	animation: slide-card 1s;
 	position: relative;
 	transform-style: preserve-3d;
 	transition: 2s 0.2s;
@@ -854,36 +869,53 @@ button#syntheseBtn {
 }
 
 #choix-cartes-autres #J3 .face-cachee {
-	background-color: var(--player4-color);
+	background-color: var(--player3-color);
 }
 
 #choix-cartes-autres #J3 .face-visible {
-	border: 2px var(--player4-color) solid;
+	border: 2px var(--player3-color) solid;
 }
 
 #choix-cartes-autres #J3 .face-visible::before,
 #choix-cartes-autres #J3 .face-visible::after {
-	color: var(--player4-color);
+	color: var(--player3-color);
 }
 
 #choix-cartes-autres #J3 .face-visible span {
-	background-color: var(--player4-color);
+	background-color: var(--player3-color);
 }
 
 #choix-cartes-autres #J4 .face-cachee {
-	background-color: var(--player5-color);
+	background-color: var(--player4-color);
 }
 
 #choix-cartes-autres #J4 .face-visible {
-	border: 2px var(--player5-color) solid;
+	border: 2px var(--player4-color) solid;
 }
 
 #choix-cartes-autres #J4 .face-visible::before,
 #choix-cartes-autres #J4 .face-visible::after {
-	color: var(--player5-color);
+	color: var(--player4-color);
 }
 
 #choix-cartes-autres #J4 .face-visible span {
+	background-color: var(--player4-color);
+}
+
+#choix-cartes-autres #J5 .face-cachee {
+	background-color: var(--player5-color);
+}
+
+#choix-cartes-autres #J5 .face-visible {
+	border: 2px var(--player5-color) solid;
+}
+
+#choix-cartes-autres #J5 .face-visible::before,
+#choix-cartes-autres #J5 .face-visible::after {
+	color: var(--player5-color);
+}
+
+#choix-cartes-autres #J5 .face-visible span {
 	background-color: var(--player5-color);
 }
 
@@ -1154,4 +1186,14 @@ button#syntheseBtn {
 	text-align: center;
 	font-size: large;
 	margin: 1em;
+}
+
+/* ---------- Disparition animation -----------*/
+.fade-out {
+	opacity: 0;
+	-webkit-transition: opacity 1s ease-in-out;
+	-moz-transition: opacity 1s ease-in-out;
+	-ms-transition: opacity 1s ease-in-out;
+	-o-transition: opacity 1s ease-in-out;
+	transition: opacity 1s ease-in-out;
 }
