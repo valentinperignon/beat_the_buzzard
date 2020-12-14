@@ -501,7 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (syntheseVocale === null) {
 				syntheseVocale = {
 					active: true,
-					volume: 0.2,
+					volume: 0.5,
 				};
 			}
 		}
@@ -791,18 +791,24 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * @param {element} e L'élément de l'évènement
 	 */
 	function eventCarte(e) {
-		sock.emit('vautour-choix-carte', {
-			id: partieActuelle,
-			from: utilisateurActuel,
-			value: e.target.innerText,
-		});
-
-		// On remonte le dom jusqu'à trouver l'élément de base de la carte
-		let target = e.target;
+		let target = e;
+		if (!(target instanceof Element)) {
+			target = target.target;
+		}
+		console.log(target);
 		if (target != null) {
 			while (!target.classList.contains('carte-main')) {
 				target = target.parentElement;
 			}
+			console.log('event');
+			sock.emit('vautour-choix-carte', {
+				id: partieActuelle,
+				from: utilisateurActuel,
+				value: target.innerText,
+			});
+
+			// On remonte le dom jusqu'à trouver l'élément de base de la carte
+
 			target.removeEventListener('mouseleave', eventMouseleaveCarte);
 			target.style = 'transition: 2s;';
 			let selectedCards = document.getElementsByClassName('selected-card');
@@ -1059,15 +1065,25 @@ document.addEventListener('DOMContentLoaded', () => {
 								parler("Si tu te décides pas je vais vraiment t'insulter");
 								setTimeout(() => {
 									if (!document.getElementsByClassName('selected-card')[0]) {
-										parler("Bon t'as gagné j'abandonne");
+										parler('Si tu fais rien, je joue à ta place !');
+										setTimeout(() => {
+											if (
+												!document.getElementsByClassName('selected-card')[0]
+											) {
+												parler("Bon bouffon je t'avais prévenu");
+												eventCarte(
+													document.getElementById('main-joueur').firstChild
+												);
+											}
+										}, 10000);
 									}
 								}, 7000);
 							}
 						}, 7000);
 					}
-				}, 6000);
+				}, 10000);
 			}
-		}, 30000);
+		}, 20000);
 	}
 
 	function disparitionCartes() {
