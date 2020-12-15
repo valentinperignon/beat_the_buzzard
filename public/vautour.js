@@ -122,6 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			input.focus();
 
 			afficherListe(liste);
+
+			// dark mode power
+			changeTheme(localStorage.getItem(`theme_${utilisateurActuel}`));
 		}
 	});
 
@@ -580,6 +583,19 @@ document.addEventListener('DOMContentLoaded', () => {
 		historique.ajouter();
 		// effacement de la zone de saisie
 		input.value = '';
+	}
+
+	function changeTheme(choice) {
+		if (choice === 'dark') {
+			document.documentElement.dataset.theme = 'dark';
+		} else {
+			choice = 'light';
+			document.documentElement.dataset.theme = 'light';
+		}
+
+		if (utilisateurActuel) {
+			localStorage.setItem(`theme_${utilisateurActuel}`, choice);
+		}
 	}
 
 	/* -------------------- Partie de Stupide Vautour -------------------- */
@@ -1178,14 +1194,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		if (keyPressed.length == 2) {
-			if (
-				!document.documentElement.dataset['theme'] ||
-				document.documentElement.dataset['theme'] != 'dark'
-			) {
-				document.documentElement.dataset['theme'] = 'dark';
-			} else {
-				document.documentElement.dataset['theme'] = 'light';
+			let theme = 'dark';
+			if (document.documentElement.dataset['theme'] === 'dark') {
+				theme = 'light';
 			}
+			console.log(theme);
+			changeTheme(theme);
 		}
 	});
 
