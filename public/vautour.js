@@ -308,12 +308,37 @@ document.addEventListener('DOMContentLoaded', () => {
 			return;
 		}
 
+		// Placer le personnage
+		UIGame.game.innerHTML = `
+    <div id="dadeau">
+      <div id="halo"></div>
+      <div id="hair"></div>
+      <div id="head">
+        <div class="ear" id="ear1"></div>
+        <div class="ear" id="ear2"></div>
+        <div id="eyes">
+          <div id="eye1" class="eye"></div>
+          <div id="eye2" class="eye"></div>
+        </div>
+        <div id="nose"></div>
+        <div id="beard"></div>
+        <div id="mouth"></div>
+      </div>
+      <div id="body"></div>
+    </div>`;
+
 		if (data.winner === utilisateurActuel) {
 			creerPopup(
-				'<p>Bravo ! Vous avez gagné cette partie.</p><button>Fermer</button>'
+				`<p>Bravo ! Vous avez gagné cette partie.</p><button>Fermer</button>`
 			);
+			setTimeout(() => {
+				document.querySelector('#dadeau').classList.add('success');
+			}, 3000);
 			parler("Mouais... pas si mal, t'as réussi à gagner finalement.");
 		} else {
+			setTimeout(() => {
+				document.querySelector('#dadeau').classList.add('bad');
+			}, 3000);
 			if (Math.random() < 0.2) {
 				parler(
 					`Bravo ! Non je déconne c'est ${data.winner} qui a gagné. T'as été nul toute la partie`
