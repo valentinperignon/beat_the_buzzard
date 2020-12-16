@@ -1304,6 +1304,7 @@ html[data-theme='dark'] .pioche-visible div {
 	position: absolute;
 	top: 10%;
 	left: 57%;
+	color: var(--color-main);
 }
 
 #scores h3 {
