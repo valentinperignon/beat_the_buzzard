@@ -516,6 +516,13 @@ html[data-theme='dark'] #game {
 	background-color: rgb(253, 190, 17);
 }
 
+@media only screen and (max-width: 450px) {
+	#game #nav span {
+		padding: 0.5em;
+		font-size: small;
+	}
+}
+
 #game main {
 	position: relative;
 	flex-grow: 1;
@@ -538,7 +545,7 @@ html[data-theme='dark'] #game {
 
 #game #wrap-chat {
 	position: absolute;
-	top: 2rem;
+	top: 0%;
 	right: 1.5rem;
 	font-size: larger;
 	padding-bottom: 0.1rem;

@@ -5,7 +5,7 @@
 let games = {};
 let maxId = 0;
 
-const FINAL_TURN = 2;
+const FINAL_TURN = 15;
 
 function Player(name, isAI = false) {
 	this.name = name;
