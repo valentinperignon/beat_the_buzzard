@@ -1000,7 +1000,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function renderVautour(data, isLaunched) {
 		UIGame.game.innerHTML = '';
 		if (!isLaunched) {
-			document.getElementsByTagName('h1')[0].style.display = 'block';
+			document.querySelector('#game main h1').style.display = 'block';
 			let listeInvitations = document.createElement('div');
 			listeInvitations.id = 'liste-invitations';
 			UIGame.game.append(listeInvitations);
@@ -1013,7 +1013,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			afficherListeJoueurs(data.hote, data.invitations);
 		} else {
-			document.getElementsByTagName('h1')[0].style.display = 'none';
+			document.querySelector('#game main h1').style.display = 'none';
 			// Afficher la partie
 			let htmlstr =
 				'<div id="choix-cartes-autres"></div><div id="scores"><h3>Scores</h3>';

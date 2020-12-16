@@ -511,7 +511,7 @@ input[type='radio']:checked + #game {
 	margin: 1rem;
 	padding: 1rem;
 	border-radius: 20px;
-	background: #f5f5f5;
+	background: var(--color-background);
 	justify-content: center;
 	box-shadow: 0 0 9px 3px rgba(0, 0, 0, 0.2);
 }
@@ -521,6 +521,7 @@ input[type='radio']:checked + #game {
 }
 
 #game aside h2 {
+	color: var(--color-main);
 	font-weight: bold;
 	font-size: 1.2rem;
 	text-transform: uppercase;
@@ -734,24 +735,42 @@ btn:hover {
 
 /* -------------------- Popup -------------------- */
 
-#popup {
-	background-color: #f5f5f5;
+#popup,
+#syntheseParam {
+	background-color: var(--color-background);
+	color: var(--color-main);
 	display: block;
 	width: 25%;
+	z-index: 999;
 	min-width: 300px;
 	max-width: 350px;
+	padding-top: 2%;
 	position: absolute;
 	text-align: center;
 	top: 50%;
 	left: 50%;
+	box-shadow: #2b2b2b;
 	transform: translate(-50%, -50%);
 }
 
-#popup p {
-	width: 100%;
+@media only screen and (max-width: 450px) {
+	#popup,
+	#syntheseParam {
+		min-width: 275px;
+		max-width: 275px;
+		min-height: 150px;
+	}
 }
 
-#popup button {
+#popup p,
+#syntheseParam label {
+	padding: 1rem;
+	width: 100%;
+	margin-bottom: 1rem;
+}
+
+#popup button,
+#syntheseParam button {
 	min-width: 60px;
 	min-height: 35px;
 	border-radius: 12px;
@@ -759,15 +778,15 @@ btn:hover {
 	margin-top: 2em;
 }
 
-#popup button:first-of-type {
-	background-color: rgba(245, 247, 244, 0.897);
-	color: rgba(39, 35, 35, 0.8);
-	border: rgba(39, 35, 35, 0.8), 1px, solid;
+#popup button:last-of-type {
+	background-color: var(--color-background2);
+	color: var(--color-main);
 }
 
-#popup button:last-of-type {
-	background-color: rgba(39, 35, 35, 0.8);
-	color: rgba(245, 247, 244, 0.897);
+#popup button:first-of-type {
+	background-color: var(--color-main);
+	color: var(--color-background2);
+	border: var(--color-background2), 1px, solid;
 }
 
 /* -------------------- Synthèse vocale -------------------- */
@@ -780,15 +799,15 @@ button#syntheseBtn {
 
 #syntheseParam {
 	display: none;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background-color: white;
 }
 
 #syntheseParam.afficherFenetre {
 	display: block;
+}
+
+#syntheseParam #volume {
+	margin-top: 1rem;
+	width: 60%;
 }
 
 /* -------------------- Partie en cours -------------------- */

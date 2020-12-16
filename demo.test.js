@@ -4,11 +4,14 @@ describe('Demo', function () {
 	let driver;
 
 	beforeEach(async function () {
-		driver = await new Builder().forBrowser('chrome').build();
+		// driver = await new Builder().forBrowser('chrome').build(); // For chrome
+
+		driver = await new Builder().forBrowser('firefox').build(); // For firefox
 	});
 
 	afterEach(async function () {
-		await driver.quit();
+		// await driver.quit(); // For chrome
+		await driver.close(); // For firefox
 	});
 
 	it('ici', async function () {
