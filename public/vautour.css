@@ -510,7 +510,6 @@ html[data-theme='dark'] #game {
 }
 
 #game main {
-	position: relative;
 	flex-grow: 1;
 	padding: 1rem;
 }
