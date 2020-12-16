@@ -524,7 +524,6 @@ html[data-theme='dark'] #game {
 }
 
 #game main {
-	position: relative;
 	flex-grow: 1;
 	padding: 1rem;
 }
@@ -654,7 +653,7 @@ html[data-theme='dark'] #game {
 	position: absolute;
 	top: 70%;
 	left: 0;
-	width: 100%;
+	width: 70%;
 	justify-content: center;
 }
 
