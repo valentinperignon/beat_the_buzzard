@@ -2,19 +2,20 @@ require('chromedriver');
 const { Builder, By, Key } = require('selenium-webdriver');
 
 describe('Demo', function () {
-	let driver;
+	let driver = null;
 
 	beforeEach(async function () {
-		driver = await new Builder().forBrowser('chrome').build(); // For chrome
+		driver = await new Builder().forBrowser('chrome').build();
 	});
 
 	afterEach(function () {
-		driver.quit(); // For chrome
-		//await driver.close(); // For firefox
+		driver.quit();
 	});
 
 	it('ici', async function () {
 		this.timeout(42000);
+
+		let tabs = null;
 
 		// Ouverture du premier onglet
 
@@ -31,8 +32,10 @@ describe('Demo', function () {
 
 		// Ouverture du deuxième onglet
 
-		await driver.findElement(By.name('body')).sendKeys(`${Key.CONTROL}t`);
-
-		await driver.sleep(2000);
-	});
+		await driver.switchTo().newWindow('tab');
+		await driver.get('http://localhost:8080/');
+	
+  });
+  
+  function connectUser()
 });
