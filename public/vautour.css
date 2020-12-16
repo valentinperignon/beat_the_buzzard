@@ -326,7 +326,14 @@ input[type='radio']:checked + #content {
 #game aside #messages {
 	padding: 2em;
 	flex-grow: 1;
-	overflow-y: scroll;
+	height: 830px;
+	overflow: auto;
+}
+
+@media only screen and (max-width: 450px) {
+	#game aside #messages {
+		height: 230px;
+	}
 }
 
 #content main .msg,
