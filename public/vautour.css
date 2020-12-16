@@ -544,7 +544,7 @@ html[data-theme='dark'] #game {
 
 #game #wrap-chat {
 	position: absolute;
-	top: 0%;
+	top: 5%;
 	right: 1.5rem;
 	font-size: larger;
 	padding-bottom: 0.1rem;
