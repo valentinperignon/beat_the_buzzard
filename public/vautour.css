@@ -510,6 +510,7 @@ html[data-theme='dark'] #game {
 }
 
 #game main {
+	position: relative;
 	flex-grow: 1;
 	padding: 1rem;
 }
@@ -539,7 +540,7 @@ html[data-theme='dark'] #game {
 #game aside {
 	transform-origin: top right;
 	transition: 0.2s;
-	transform: scale(100%, 100%);
+	transform: scale(1, 1);
 	display: block;
 	position: relative;
 	min-width: 20rem;
@@ -552,7 +553,7 @@ html[data-theme='dark'] #game {
 }
 
 #game aside.hidden-chat {
-	transform: scale(0%, 0%);
+	transform: scale(0, 0);
 }
 
 #game aside h2 {
@@ -623,7 +624,8 @@ html[data-theme='dark'] #game {
 	display: flex;
 	position: absolute;
 	top: 70%;
-	width: 70%;
+	left: 0;
+	width: 100%;
 	justify-content: center;
 }
 
@@ -638,6 +640,7 @@ html[data-theme='dark'] #game {
 	cursor: pointer;
 	word-break: break-all;
 	line-height: 95px;
+	flex-shrink: 0;
 }
 
 #game main #liste-invitations #carte-hote::before {
