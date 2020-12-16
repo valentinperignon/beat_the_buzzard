@@ -510,6 +510,7 @@ html[data-theme='dark'] #game {
 }
 
 #game main {
+	position: relative;
 	flex-grow: 1;
 	padding: 1rem;
 }
@@ -533,13 +534,27 @@ html[data-theme='dark'] #game {
 	top: 2rem;
 	right: 1.5rem;
 	font-size: larger;
+	padding-bottom: 0.1rem;
 	z-index: 10;
+	color: var(--color-main);
+	border: solid 1px var(--color-main);
+	box-shadow: 0px 0px 5px 0px var(--color-main);
+	background-color: var(--color-background2);
+}
+
+@media only screen and (max-width: 450px) {
+	#game #wrap-chat {
+		top: 2.8rem;
+		right: 0.4rem;
+		font-size: medium;
+		z-index: 2;
+	}
 }
 
 #game aside {
 	transform-origin: top right;
 	transition: 0.2s;
-	transform: scale(100%, 100%);
+	transform: scale(1, 1);
 	display: block;
 	position: relative;
 	min-width: 20rem;
@@ -552,7 +567,7 @@ html[data-theme='dark'] #game {
 }
 
 #game aside.hidden-chat {
-	transform: scale(0%, 0%);
+	transform: scale(0, 0);
 }
 
 #game aside h2 {
@@ -612,8 +627,9 @@ html[data-theme='dark'] #game {
 	#game aside {
 		position: absolute;
 		width: 95%;
-		left: 0%;
 		height: 45%;
+		left: 0%;
+		top: 3%;
 	}
 }
 
@@ -623,7 +639,8 @@ html[data-theme='dark'] #game {
 	display: flex;
 	position: absolute;
 	top: 70%;
-	width: 70%;
+	left: 0;
+	width: 100%;
 	justify-content: center;
 }
 
@@ -638,6 +655,7 @@ html[data-theme='dark'] #game {
 	cursor: pointer;
 	word-break: break-all;
 	line-height: 95px;
+	flex-shrink: 0;
 }
 
 #game main #liste-invitations #carte-hote::before {
