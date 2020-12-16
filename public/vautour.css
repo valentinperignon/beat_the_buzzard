@@ -157,6 +157,12 @@ html {
 	--player3-color: rgb(82, 211, 82);
 	--player4-color: rgb(255, 217, 0);
 	--player5-color: rgb(221, 42, 191);
+
+	--game-orange1: #fd8e34;
+	--game-orange2: #f08831;
+
+	--transition-time: 0.3s;
+	--transition-func: ease-in-out;
 }
 
 html[data-theme='dark'] {
@@ -170,11 +176,16 @@ html[data-theme='dark'] {
 	--color-gray: rgb(44, 44, 46);
 
 	--color-main: white;
+
+	--game-orange1: #d44200;
+	--game-orange2: #ff4a00;
 }
 
 body {
 	font-family: sans-serif;
 	background-color: var(--color-background);
+
+	transition: background-color var(--transition-time) var(--transition-func);
 }
 
 * {
@@ -198,6 +209,8 @@ input[type='text'] {
 	border-radius: var(--radius);
 	font-size: 1rem;
 	color: var(--color-main);
+
+	transition: all var(--transition-time) var(--transition-func);
 }
 
 input[type='text']:focus {
@@ -225,6 +238,8 @@ input[type='radio']:checked + #logScreen {
 	border-radius: var(--radius-main);
 	padding: 3rem 2.5rem;
 	box-shadow: 0 0 13px 2px rgba(0, 0, 0, 0.2);
+
+	transition: background-color var(--transition-time) var(--transition-func);
 }
 
 html[data-theme='dark'] #logScreen > div {
@@ -237,6 +252,8 @@ html[data-theme='dark'] #logScreen > div {
 	font-weight: bold;
 	margin-bottom: 1.8rem;
 	color: var(--color-main);
+
+	transition: color var(--transition-time) var(--transition-func);
 }
 
 #logScreen > div > input[type='text'] {
@@ -290,15 +307,19 @@ input[type='radio']:checked + #content {
 	height: 100vh;
 	width: 100vw;
 	border: 1.5em solid var(--color-background);
+
+	transition: border-color var(--transition-time) var(--transition-func);
 }
 
 #content main {
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	background: var(--color-background2);
+	background-color: var(--color-background2);
 	border-top-right-radius: var(--radius-main);
 	border-bottom-right-radius: var(--radius-main);
+
+	transition: background-color var(--transition-time) var(--transition-func);
 }
 
 #content main #messages,
@@ -309,27 +330,31 @@ input[type='radio']:checked + #content {
 }
 
 #content main .msg,
-#game aside .msg {
+#game aside #messages div {
 	margin-bottom: 1rem;
 }
 
 #content main .msg h3,
-#game aside .msg h3 {
+#game aside #messages div h3 {
 	font-weight: bold;
 	margin-bottom: 0.5rem;
 	color: var(--color-main);
+
+	transition: color var(--transition-time) var(--transition-func);
 }
 
 #content main .msg h3 span,
-#game aside .msg h3 span {
+#game aside #messages div h3 span {
 	font-weight: normal;
 	color: var(--color-gray2);
 	font-size: 0.8rem;
 	margin-left: 0.1rem;
+
+	transition: color var(--transition-time) var(--transition-func);
 }
 
 #content main .msg p,
-#game aside .msg p {
+#game aside #messages div p {
 	display: inline-block;
 	word-wrap: break-word;
 	font-size: 1rem;
@@ -338,25 +363,27 @@ input[type='radio']:checked + #content {
 	border-radius: 20px;
 	background-color: var(--color-gray);
 	color: var(--color-main);
+
+	transition: all var(--transition-time) var(--transition-func);
 }
 
 #content main .msg.moi,
-#game aside .msg.moi {
+#game aside #messages div.moi {
 	text-align: right;
 }
 
 #content main .msg.moi p,
-#game aside .msg.moi p {
+#game aside #messages div.moi p {
 	background-color: var(--color-orange0);
 }
 
 #content main .msg.system,
-#game aside .msg.system {
+#game aside #messages div.system {
 	text-align: center;
 }
 
 #content main .msg.system p,
-#game aside .msg.system p {
+#game aside #messages div.system p {
 	padding: 0;
 	background: none;
 }
@@ -450,6 +477,14 @@ input[type='radio']:checked + #game {
 	justify-content: flex-start;
 	align-items: stretch;
 	background-color: rgb(243, 103, 22);
+	background-image: url('./assets/day.jpg');
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: cover;
+}
+
+html[data-theme='dark'] #game {
+	background-image: url('./assets/night.jpg');
 }
 
 /** nav **/
@@ -481,6 +516,7 @@ input[type='radio']:checked + #game {
 
 /* titre */
 #game main h1 {
+	color: var(--color-main);
 	font-family: 'Permanent Marker', cursive;
 	font-weight: 900;
 	font-size: 3rem;
@@ -510,10 +546,9 @@ input[type='radio']:checked + #game {
 	width: 30%;
 	margin: 1rem;
 	padding: 1rem;
-	border-radius: 20px;
-	background: var(--color-background);
-	justify-content: center;
-	box-shadow: 0 0 9px 3px rgba(0, 0, 0, 0.2);
+	border-radius: 12px;
+	background: var(--color-background2);
+	color: var(--color-main);
 }
 
 #game aside.hidden-chat {
@@ -527,7 +562,12 @@ input[type='radio']:checked + #game {
 	text-transform: uppercase;
 	height: 1.4rem;
 	text-align: center;
-	margin-bottom: 1rem;
+}
+
+#game aside #messages {
+	overflow: auto;
+	max-height: 90%;
+	scrollbar-width: 5%;
 }
 
 #game aside #send-messages {
@@ -540,13 +580,8 @@ input[type='radio']:checked + #game {
 #game aside #message {
 	position: relative;
 	height: 2rem;
-	border-radius: 30px;
-	padding: 5%;
 	margin-top: 5%;
 	margin-right: 3%;
-	border: 1px grey solid;
-	background-color: #e4e3e3;
-	text-align: left;
 	width: 82%;
 	min-width: 30%;
 	display: inline-block;
@@ -586,7 +621,8 @@ input[type='radio']:checked + #game {
 #game main #liste-invitations .carte-joueur {
 	width: 100px;
 	height: 100px;
-	background-color: #f5f5f5;
+	background-color: var(--color-background2);
+	color: var(--color-main);
 	border-radius: 10px;
 	text-align: center;
 	margin: 1rem;
@@ -851,6 +887,12 @@ button#syntheseBtn {
 	border-radius: 10%;
 }
 
+.pioche,
+.pioche-visible,
+.carte-joueur {
+	background-color: var(--color-background2);
+}
+
 /* --------- Other players' cards ---------*/
 #choix-cartes-autres {
 	display: flex;
@@ -1009,9 +1051,20 @@ button#syntheseBtn {
 	width: 102%;
 }
 
+html[data-theme='dark'] .pioche-visible div span {
+	background-color: white;
+	color: black;
+	width: 102%;
+}
+
 .top-pioche div,
 .pioche-visible div {
 	border: 2px black solid;
+}
+
+html[data-theme='dark'] .top-pioche div,
+html[data-theme='dark'] .pioche-visible div {
+	border: 2px white solid;
 }
 
 .pioche,

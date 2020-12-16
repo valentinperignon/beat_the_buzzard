@@ -126,6 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			// dark mode power
 			changeTheme(localStorage.getItem(`theme_${utilisateurActuel}`));
+			// synthèse
+			initSynthese();
 		}
 	});
 
@@ -492,13 +494,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		UIChat.messages.innerHTML += message;
 		UIGame.chat.messages.innerHTML += message;
 		if (UIChat.radio.checked) {
-			let msg = document.querySelector('#content > main > p:last-child');
+			let msg = document.querySelector(
+				'#content > main > #messages > .msg:last-child'
+			);
 			if (msg != null) {
 				msg.scrollIntoView();
 			}
 		} else {
 			let msg = document.querySelector(
-				'#game > aside > #messages > p:last-child'
+				'#game > aside > #messages > .msg:last-child'
 			);
 			if (msg != null) {
 				msg.scrollIntoView();
@@ -507,16 +511,14 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function initSynthese() {
+		syntheseVocale = JSON.parse(
+			localStorage.getItem(`voice_${utilisateurActuel}`)
+		);
 		if (syntheseVocale === null) {
-			syntheseVocale = JSON.parse(
-				localStorage.getItem(`voice_${utilisateurActuel}`)
-			);
-			if (syntheseVocale === null) {
-				syntheseVocale = {
-					active: true,
-					volume: 0.5,
-				};
-			}
+			syntheseVocale = {
+				active: true,
+				volume: 0.5,
+			};
 		}
 	}
 
@@ -1230,7 +1232,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (document.documentElement.dataset['theme'] === 'dark') {
 				theme = 'light';
 			}
-			console.log(theme);
 			changeTheme(theme);
 		}
 	});
