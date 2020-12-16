@@ -1022,6 +1022,12 @@ html[data-theme='dark'] #choix-cartes-autres > span {
 	width: 50%;
 }
 
+@media only screen and (max-width: 450px) {
+	#choix-cartes-autres {
+		width: 65%;
+	}
+}
+
 @keyframes slide-card {
 	0% {
 		top: -100%;

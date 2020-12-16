@@ -4,33 +4,37 @@ const { Builder, By, Key } = require('selenium-webdriver');
 describe('Demo', function () {
 	let driver;
 
-	beforeEach(function () {
-		driver = new Builder().forBrowser('chrome').build(); // For chrome
-
-		// driver =  new Builder().forBrowser('firefox').build(); // For firefox
+	beforeEach(async function () {
+		driver = await new Builder().forBrowser('chrome').build(); // For chrome
 	});
 
 	afterEach(function () {
 		driver.quit(); // For chrome
-		// driver.close(); // For firefox
+		//await driver.close(); // For firefox
 	});
 
-	it('ici', function () {
+	it('ici', async function () {
+		this.timeout(42000);
+
 		driver.get('http://localhost:8080/');
 		driver.manage().window().setRect(1680, 1025);
 
-		driver.findElement(By.id('pseudo')).sendKeys('fdadeau');
-		driver.findElement(By.id('btnConnecter')).click();
+		await driver.sleep(2000);
 
-		driver.findElement(By.id('monMessage')).click();
-		driver.findElement(By.id('monMessage')).sendKeys('bonjour');
-		driver.findElement(By.id('monMessage')).sendKeys(Key.ENTER);
-		driver.findElement(By.id('monMessage')).sendKeys('les jeunes');
-		driver.findElement(By.id('monMessage')).sendKeys(Key.ENTER);
-		driver.findElement(By.id('monMessage')).sendKeys('typiquement');
-		driver.findElement(By.id('monMessage')).sendKeys(Key.ENTER);
-		driver.findElement(By.id('monMessage')).sendKeys('/vautour');
-		driver.findElement(By.id('monMessage')).sendKeys(Key.ENTER);
-		driver.sleep(2000);
+		await driver.findElement(By.id('pseudo')).sendKeys('fdadeau');
+		await driver.sleep(1000);
+		await driver.findElement(By.id('btnConnecter')).click();
+
+		await driver.sleep(3000);
+
+		await driver.findElement(By.id('monMessage')).click();
+		await driver.findElement(By.id('monMessage')).sendKeys('bonjour');
+		await driver.findElement(By.id('monMessage')).sendKeys(Key.ENTER);
+		await driver.findElement(By.id('monMessage')).sendKeys('les jeunes');
+		await driver.findElement(By.id('monMessage')).sendKeys(Key.ENTER);
+		await driver.findElement(By.id('monMessage')).sendKeys('typiquement');
+		await driver.findElement(By.id('monMessage')).sendKeys(Key.ENTER);
+		await driver.findElement(By.id('monMessage')).sendKeys('/vautour');
+		await driver.findElement(By.id('monMessage')).sendKeys(Key.ENTER);
 	});
 });
