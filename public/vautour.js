@@ -1248,7 +1248,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	document.addEventListener('keydown', e => {
 		if (e.key === 'Control' || e.key === 'd') {
-			e.preventDefault();
+			//e.preventDefault();
 			keyPressed.push(e.key);
 		}
 

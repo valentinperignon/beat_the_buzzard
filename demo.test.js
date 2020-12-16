@@ -16,25 +16,23 @@ describe('Demo', function () {
 	it('ici', async function () {
 		this.timeout(42000);
 
-		driver.get('http://localhost:8080/');
-		driver.manage().window().setRect(1680, 1025);
+		// Ouverture du premier onglet
+
+		await driver.get('http://localhost:8080/');
+		await driver.manage().window().setRect(1680, 1025);
 
 		await driver.sleep(2000);
 
-		await driver.findElement(By.id('pseudo')).sendKeys('fdadeau');
+		await driver.findElement(By.id('pseudo')).sendKeys('dadeau');
 		await driver.sleep(1000);
 		await driver.findElement(By.id('btnConnecter')).click();
 
-		await driver.sleep(3000);
+		await driver.sleep(2000);
 
-		await driver.findElement(By.id('monMessage')).click();
-		await driver.findElement(By.id('monMessage')).sendKeys('bonjour');
-		await driver.findElement(By.id('monMessage')).sendKeys(Key.ENTER);
-		await driver.findElement(By.id('monMessage')).sendKeys('les jeunes');
-		await driver.findElement(By.id('monMessage')).sendKeys(Key.ENTER);
-		await driver.findElement(By.id('monMessage')).sendKeys('typiquement');
-		await driver.findElement(By.id('monMessage')).sendKeys(Key.ENTER);
-		await driver.findElement(By.id('monMessage')).sendKeys('/vautour');
-		await driver.findElement(By.id('monMessage')).sendKeys(Key.ENTER);
+		// Ouverture du deuxième onglet
+
+		await driver.findElement(By.name('body')).sendKeys(`${Key.CONTROL}t`);
+
+		await driver.sleep(2000);
 	});
 });
