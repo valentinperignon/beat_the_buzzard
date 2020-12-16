@@ -1,27 +1,31 @@
+require('chromedriver');
 const { Builder, By, Key } = require('selenium-webdriver');
 
 describe('Demo', function () {
 	let driver;
 
 	beforeEach(async function () {
-		// driver = await new Builder().forBrowser('chrome').build(); // For chrome
-
 		driver = await new Builder().forBrowser('chrome').build(); // For chrome
 	});
 
-	afterEach(async function () {
-		await driver.quit(); // For chrome
+	afterEach(function () {
+		driver.quit(); // For chrome
 		//await driver.close(); // For firefox
 	});
 
 	it('ici', async function () {
-		await driver.get('http://localhost:8080/');
-		await driver.manage().window().setRect(1680, 1025);
+		this.timeout(42000);
+
+		driver.get('http://localhost:8080/');
+		driver.manage().window().setRect(1680, 1025);
 
 		await driver.sleep(2000);
 
 		await driver.findElement(By.id('pseudo')).sendKeys('fdadeau');
+		await driver.sleep(1000);
 		await driver.findElement(By.id('btnConnecter')).click();
+
+		await driver.sleep(3000);
 
 		await driver.findElement(By.id('monMessage')).click();
 		await driver.findElement(By.id('monMessage')).sendKeys('bonjour');
