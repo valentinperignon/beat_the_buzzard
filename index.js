@@ -333,6 +333,7 @@ io.on('connection', function (socket) {
 	socket.on('vautour-infos', data => {
 		if (
 			clients[data.from] != undefined &&
+			partieVautour.getAI(data.id) != null &&
 			!partieVautour.getAI(data.id).has(data.from)
 		) {
 			clients[data.from].emit('vautour-infos', {

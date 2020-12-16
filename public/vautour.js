@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			"J'ai rarement vu quelqu'un d'aussi mauvais à ce jeu.",
 			"Ca doit pas être facile tous les jours d'être comme toi",
 			'Je me demande qui est le plus stupide, ce vautour ou toi ?',
-			'Et après on se demande pourquoi vous avez peur de vous faire dépasser par les iha',
+			'Et après on se demande pourquoi vous avez peur de vous faire dépasser par les intelligences artificielles',
 		],
 		aucuneCarte: [
 			'Bonne nouvelle : tu ne perds aucun point. Mauvaise nouvelle: tu ne gagnes aucun point non plus.',
@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		navbar: document.getElementById('nav'),
 		game: document.getElementById('game-content'),
 		chat: {
+			wrap: document.getElementById('wrap-chat'),
 			messages: document.querySelector('#game aside #messages'),
 			input: document.querySelector('#game aside #send-messages #message'),
 			btnSend: document.querySelector('#game aside #send-messages #envoyer'),
@@ -299,12 +300,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	sock.on('vautour-fin-partie', data => {
 		if (!data.winner) {
 			parler("Fin de la partie ! Personne n'a gagné...");
-			alert("Fin de la partie ! Personne n'a gagné...");
+			creerPopup(
+				`<p>Fin de la partie ! Personne n'a gagné...</p><button>Fermer</button>`
+			);
 			return;
 		}
 
 		if (data.winner === utilisateurActuel) {
-			alert('Bravo ! Vous avez gagné cette partie.');
+			creerPopup(
+				'<p>Bravo ! Vous avez gagné cette partie.</p><button>Fermer</button>'
+			);
 			parler("Mouais... pas si mal, t'as réussi à gagner finalement.");
 		} else {
 			if (Math.random() < 0.2) {
@@ -314,7 +319,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			} else {
 				parler(`C'est perdu... ${data.winner} gagne la partie.`);
 			}
-			alert(`C'est perdu... ${data.winner} gagne la partie.`);
+			creerPopup(
+				`<p>C'est perdu... ${data.winner} gagne la partie.</p><button>Fermer</button>`
+			);
 		}
 	});
 
@@ -1048,9 +1055,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		);
 		if (data.winner === utilisateurActuel) {
 			if (carteNumero > 0) {
-				alert("C'est gagné ! Vous remportez la carte Souris.");
+				creerPopup(
+					"<p>C'est gagné ! Vous remportez la carte Souris.</p><button>Fermer</button>"
+				);
 			} else {
-				alert("C'est perdu ! Vous obtenez la carte Vautour.");
+				creerPopup(
+					"<p>C'est perdu ! Vous obtenez la carte Vautour.</p><button>Fermer</button>"
+				);
 				parler(
 					encouragerLeJoueur.carteVautour[
 						getRandomNumber(encouragerLeJoueur.carteVautour.length)
@@ -1074,20 +1085,33 @@ document.addEventListener('DOMContentLoaded', () => {
 		renderVautour(data, true);
 		// Remercier les personnes lentes à jouer
 		setTimeout(() => {
-			if (!document.getElementsByClassName('selected-card')[0]) {
+			if (
+				!document.getElementsByClassName('selected-card')[0] &&
+				UIGame.radio.checked == true
+			) {
 				parler('Aller dépêches-toi un peu');
 				setTimeout(() => {
-					if (!document.getElementsByClassName('selected-card')[0]) {
+					if (
+						!document.getElementsByClassName('selected-card')[0] &&
+						UIGame.radio.checked == true
+					) {
 						parler('On a pas toute la journée');
 						setTimeout(() => {
-							if (!document.getElementsByClassName('selected-card')[0]) {
+							if (
+								!document.getElementsByClassName('selected-card')[0] &&
+								UIGame.radio.checked == true
+							) {
 								parler("Si tu te décides pas je vais vraiment t'insulter");
 								setTimeout(() => {
-									if (!document.getElementsByClassName('selected-card')[0]) {
+									if (
+										!document.getElementsByClassName('selected-card')[0] &&
+										UIGame.radio.checked == true
+									) {
 										parler('Si tu fais rien, je joue à ta place !');
 										setTimeout(() => {
 											if (
-												!document.getElementsByClassName('selected-card')[0]
+												!document.getElementsByClassName('selected-card')[0] &&
+												UIGame.radio.checked == true
 											) {
 												parler("Bon bouffon je t'avais prévenu");
 												eventCarte(
@@ -1136,7 +1160,14 @@ document.addEventListener('DOMContentLoaded', () => {
 	UIChat.users.addEventListener('click', e => {
 		UIChat.input.value += `@${e.target.innerText}`;
 	});
+
 	// Game
+	UIGame.chat.wrap.addEventListener('click', () => {
+		if (document.querySelector('#game aside')) {
+			document.querySelector('#game aside').classList.toggle('hidden-chat');
+		}
+	});
+
 	UIGame.chat.btnSend.addEventListener('click', () =>
 		envoyer(UIGame.chat.input)
 	);
@@ -1190,6 +1221,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	document.addEventListener('keydown', e => {
 		if (e.key === 'Control' || e.key === 'd') {
+			e.preventDefault();
 			keyPressed.push(e.key);
 		}
 
