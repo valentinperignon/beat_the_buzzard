@@ -544,7 +544,7 @@ html[data-theme='dark'] #game {
 
 #game #wrap-chat {
 	position: absolute;
-	top: 0%;
+	top: 5%;
 	right: 1.5rem;
 	font-size: larger;
 	padding-bottom: 0.1rem;
@@ -1020,6 +1020,12 @@ html[data-theme='dark'] #choix-cartes-autres > span {
 	top: 10%;
 	left: 9%;
 	width: 50%;
+}
+
+@media only screen and (max-width: 450px) {
+	#choix-cartes-autres {
+		width: 65%;
+	}
 }
 
 @keyframes slide-card {

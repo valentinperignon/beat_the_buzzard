@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	 * Réception d'une erreur de connexion
 	 */
 	sock.on('erreur-connexion', msg => {
-		alert(msg);
+		creerPopup(`<p>${msg}</p><button>Fermer</button>`);
 		const { btn } = UIConnexion;
 		btn.value = 'Se connecter';
 		btn.disabled = false;
@@ -1281,7 +1281,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		UI.input.addEventListener('keydown', e => {
 			switch (e.key) {
 				case 'Tab': // tabulation
-					e.preventDefault(); // empêche de perdre le focus
+					// e.preventDefault(); // empêche de perdre le focus
 					completion.next();
 					break;
 				case 'ArrowUp': // fleche haut
