@@ -17,6 +17,7 @@
 	"scripts": {
 		"start": "node .",
 		"test": "mocha modules/partie.test.js",
+		"demo": "mocha demo.test.js",
 		"format": "prettier -w .",
 		"lint": "eslint .",
 		"format:check": "prettier -c ."
