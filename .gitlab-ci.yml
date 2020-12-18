@@ -1,15 +1,8 @@
 default:
   image: node
 
-check-code:
-  stage: test
-  script:
-    - npm install
-    - npm run lint
-    - npm run format:check
-
 test-modules:
   stage: test
   script:
     - npm install
-    - npm run test
+    - npm test
